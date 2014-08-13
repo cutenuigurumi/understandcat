@@ -3,11 +3,11 @@
 
 int main()
 {
-    int i = 100, sum = 0;
-    while (i > 0){
+    int i = 1, sum = 0;
+    do {
         sum = sum + i;
-        i--;
-    }
-    printf("1+2+3+...100の答えは%dです。/n", sum);
+        i++;
+    } while (i <= 100);
+    printf("1+2+3+...100 = %dです。\n", sum);
     return 0;
 }
