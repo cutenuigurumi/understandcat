@@ -1,0 +1,24 @@
+#include<stdio.h>
+
+int main()
+{
+
+    //i 配列の添字、n number　入力された数値、count 何番目の入力数値か stock ユーザが入力した数値を入れておく配列
+    int i, n, count = 1, stock[10];
+
+    for(i = 0; i <= 9; i++) {
+        printf("%d番目の数値を入力してください。\n", count);
+        scanf("%d", &n);
+        stock[i] = n;
+            if(count == 10) {
+                break;
+            }
+        count++;
+    }
+
+    for(i = 9; i >= 0; i--) {
+        printf("%d番目の数値：%d\n", count, stock[i]);
+        count --;
+    }
+    return 0;
+}
