@@ -11,8 +11,9 @@ int main()
         scanf("%d", &stock[i]);
     }
 
-    for(i = 9; i > 10; i--) {
-        printf("%d番目の数値：%d\n", i + 1, stock[i]);
+    for(i = 10; i > 0; i--) {
+        printf("%d番目の数値：%d\n", i, stock[i - 1]);
     }
     return 0;
 }
+
