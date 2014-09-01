@@ -1,10 +1,11 @@
 #include<stdio.h>
 
-char name[40];
-int i, overFourtyFlag = 0;
 
 int main()
 {
+
+    char name[40];
+    int i, overFourtyFlag = 0;
 
     printf("お名前を40文字以内で:");
     scanf("%[^\n]", name);
@@ -17,7 +18,7 @@ int main()
         }
     i++;
     }
-    if(flag == 0){
+    if(overFourtyFlag == 0){
         printf("はじめまして、%sさん！\n", name);
     }
 
