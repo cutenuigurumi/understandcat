@@ -7,7 +7,7 @@ int main()
 {
 
     printf("お名前を40文字以内で:");
-    scanf("%s", name);
+    scanf("%[^\n]", name);
 
     while(name[i] != '\0') {
         if(i > 40) {
@@ -18,10 +18,9 @@ int main()
     i++;
     }
     if(flag == 0){
-    printf("はじめまして、%sさん！\n", name);
+        printf("はじめまして、%sさん！\n", name);
     }
 
     return 0;
 
 }
-
