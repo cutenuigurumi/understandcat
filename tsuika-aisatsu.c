@@ -1,9 +1,7 @@
 #include<stdio.h>
 
-
 int main()
 {
-
     char name[40];
     int i, overFourtyFlag = 0;
 
@@ -16,7 +14,7 @@ int main()
             overFourtyFlag = 1;
             break;
         }
-    i++;
+        i++;
     }
     if(overFourtyFlag == 0){
         printf("はじめまして、%sさん！\n", name);
