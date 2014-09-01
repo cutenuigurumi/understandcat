@@ -1,34 +1,23 @@
-#include<stdio.h>
-#include<stdlib.h>
+include<stdio.h>
 
-int inputNumber;
-int i = 0, flag;
-char charNumber[100];
+double inputScore;
+int i = 0, resultScore;
 
 int main()
 {
-    do {
-        printf("点数を入力してください：");
-        scanf("%d", &inputNumber);
-        sprintf(charNumber, "%d", inputNumber);
+    printf("点数を入力してください(小数点以下は切り捨てされます)：");
+    scanf("%lf", &inputScore);
+    resultScore = (int)inputScore;
 
-        printf("ナンバー：%s,%d", charNumber,inputNumber );
-        while(charNumber[i] != '\0') {
-            if(charNumber[i] == '.'){
-                printf("小数点以下は入れないでください\n");
-                break;
-            }
-            i++;
-        }
-    } while(1);
+    printf("%d", resultScore);
 
-    if(inputNumber > 100) {
+    if(resultScore > 100) {
         printf("数字を間違えていませんか\n");
-    } else if(inputNumber >= 80 &&inputNumber <= 100){
+    } else if(resultScore >= 80 &&resultScore <= 100){
         printf("評価は優です\n");
-    } else if(inputNumber >= 70 && inputNumber <= 79){
+    } else if(resultScore >= 70 && resultScore <= 79){
         printf("評価は良です\n");
-    } else if(inputNumber >= 60 && inputNumber <= 69){
+    } else if(resultScore >= 60 && resultScore <= 69){
         printf("評価は可です\n");
     } else {
         printf("評価は不可です\n");
