@@ -10,7 +10,7 @@ int main()
     scanf("%lf", &inputScore);
     resultScore = (int)inputScore;
 
-    if(resultScore > 100 || resultScore <= 0) {
+    if(resultScore > 100 || resultScore < 0) {
         printf("数字を間違えていませんか\n");
     } else if(resultScore >= 80 && resultScore <= 100){
         printf("評価は優です\n");
