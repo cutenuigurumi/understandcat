@@ -9,8 +9,6 @@ int main()
     scanf("%lf", &inputScore);
     resultScore = (int)inputScore;
 
-    printf("%d", resultScore);
-
     if(resultScore > 100) {
         printf("数字を間違えていませんか\n");
     } else if(resultScore >= 80 &&resultScore <= 100){
