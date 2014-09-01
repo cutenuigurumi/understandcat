@@ -1,7 +1,7 @@
 #include<stdio.h>
 
 char name[40];
-int i, flag = 0;
+int i, overFourtyFlag = 0;
 
 int main()
 {
@@ -12,7 +12,7 @@ int main()
     while(name[i] != '\0') {
         if(i > 40) {
             printf("40文字以内で入力してください\n");
-            flag = 1;
+            overFourtyFlag = 1;
             break;
         }
     i++;
