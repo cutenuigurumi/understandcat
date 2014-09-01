@@ -1,4 +1,4 @@
-include<stdio.h>
+#include<stdio.h>
 
 int inputNumber1 = 0, inputNumber2 = 0, low = 0, high = 0, check = 0, total = 0;
 
