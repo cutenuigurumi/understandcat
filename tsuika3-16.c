@@ -1,17 +1,18 @@
-include<stdio.h>
+#include<stdio.h>
 
-double inputScore;
-int i = 0, resultScore;
 
 int main()
 {
+    double inputScore;
+    int i = 0, resultScore;
+
     printf("点数を入力してください(小数点以下は切り捨てされます)：");
     scanf("%lf", &inputScore);
     resultScore = (int)inputScore;
 
-    if(resultScore > 100) {
+    if(resultScore > 100 || resultScore <= 0) {
         printf("数字を間違えていませんか\n");
-    } else if(resultScore >= 80 &&resultScore <= 100){
+    } else if(resultScore >= 80 && resultScore <= 100){
         printf("評価は優です\n");
     } else if(resultScore >= 70 && resultScore <= 79){
         printf("評価は良です\n");
