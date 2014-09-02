@@ -9,7 +9,7 @@ int main()
 
     for(i = 0;i < 5; i++){
         vb[i] = va[i];
-        printf("%2d %2d\n", va[i], va[i]);
+        printf("%2d %2d\n", va[i], vb[i]);
     }
 
 
