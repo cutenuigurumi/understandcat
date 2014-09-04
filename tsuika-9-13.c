@@ -8,13 +8,14 @@ int main()
     char string[40];
     printf("文字列を入力してください：");
     scanf("%40[^\n]", string);
-    count = count_Length_Func(string);
+//    count = count_Length_Func(string);
     if(count > 40){
         printf("40文字以上は入力ができません\n");
     } else {
         printf("何回表示しますか：");
         scanf("%d", &times);
     }
+    put_stringn(string, times);
     return 0;
 }
 
