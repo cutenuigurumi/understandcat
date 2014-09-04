@@ -5,7 +5,7 @@ int count_Length_Func(const char string[]);
 int main()
 {
     int times, count;
-    char string[40], buffer;
+    char string[40];
     printf("文字列を入力してください：");
     scanf("%40[^\n]", string);
     count = count_Length_Func(string);
