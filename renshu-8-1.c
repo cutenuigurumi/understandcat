@@ -23,7 +23,7 @@ int main()
 
     printf("%d名の100m走の平均タイムは%5.2fです。\n", i, average);
 
-    while(i > studentNumber){
+    while(studentNumber < i){
         printf("出席番号%d:%5.2f秒です。\n", studentNumber +1, studentRecord[studentNumber]);
         studentNumber++;
         }
