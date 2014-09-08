@@ -26,7 +26,7 @@ int main()
     while(studentNumber < i){
         printf("出席番号%d:%5.2f秒です。\n", studentNumber +1, studentRecord[studentNumber]);
         studentNumber++;
-        }
+    }
 
     return 0;
 
