@@ -11,12 +11,13 @@ int main()
         scanf("%lf", &tmpStudentRecord);
         if(tmpStudentRecord == 999){
             break;
-        } else if(tmpStudentRecord > 100 || tmpStudentRecord < 0){
-            printf("100秒以上、または値が不正です。\n登録できません。");
+        } else if(tmpStudentRecord > 100 || tmpStudentRecord <= 0){
+            printf("100秒以上、または値が不正です。\n登録できません。\n");
+        } else {
+            studentRecord[i] = tmpStudentRecord;
+            sum += tmpStudentRecord;
+            i++;
         }
-        studentRecord[i] = tmpStudentRecord;
-        sum += tmpStudentRecord;
-        i++;
     }while(i < 40);
 
     average = sum / i;
