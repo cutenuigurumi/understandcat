@@ -4,7 +4,6 @@ int main()
 {
     int i = 0, studentNumber = 0;
     double tmpStudentRecord,studentRecord[40],average = 0, sum = 0;
-    int endFlag = 0;
 
     do {
         printf("出席番号%d番の100mのタイムを入力してください(終了→ 999)----", i + 1);
