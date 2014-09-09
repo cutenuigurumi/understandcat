@@ -1,6 +1,7 @@
 #include<stdio.h>
 
 int countCharacter(char *);
+void turnOverCharacter(int ,char *);
 int main()
 {
     int countLength = 0;
@@ -11,12 +12,9 @@ int main()
 
     //文字のカウント処理
     countLength = countCharacter(inputCharacter);
+    turnOverCharacter(countLength, inputCharacter);
 
-    while(countLength >= 0){
-        printf("%c", inputCharacter[countLength]);
-        countLength--;
-    }
-    printf("\n");
+    return 0;
 }
 
 int countCharacter(char *inputCharacter)
@@ -28,3 +26,13 @@ int countCharacter(char *inputCharacter)
         return (countLength);
 
 }
+
+void turnOverCharacter(int countLength, char *inputCharacter)
+{
+    while(countLength >= 0){
+        printf("%c", inputCharacter[countLength]);
+        countLength--;
+    }
+    printf("\n");
+}
+~          
