@@ -35,4 +35,3 @@ void turnOverCharacter(int countLength, char *inputCharacter)
     }
     printf("\n");
 }
-~          
