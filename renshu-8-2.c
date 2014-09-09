@@ -17,9 +17,9 @@ int main()
             printf("正しい日付を入力してください。\n");
             continue;
         }
-            day = inputDate % 7;
-            printf("%s曜日です\n", charDay[day]);
-            endFlag = 1;
+        day = inputDate % 7;
+        printf("%s曜日です\n", charDay[day]);
+        endFlag = 1;
     } while(endFlag == 0);
 
 }
