@@ -24,9 +24,7 @@ int countCharacter(char *inputCharacter)
     int countLength = 0;
     while(inputCharacter[countLength] != '\0'){
         countLength++;
-//      printf("%d", countLength);
     }
         return (countLength);
 
 }
-
