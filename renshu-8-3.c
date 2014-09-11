@@ -1,37 +1,38 @@
 #include<stdio.h>
 
-int countCharacter(char *);
-void turnOverCharacter(int ,char *);
+char turnOver(const char *);
 int main()
 {
-    int countLength = 0;
-    char *inputCharacter;
+    //reversedString[0]には'\0'が入っているので配列だけど1からスタート。
+    int k = 1;
+    char inputString[40], reversedString[40];
     //文字入力
     printf("文字を入力してください。");
-    scanf("%s", inputCharacter);
+    scanf("%s", inputString);
+    reversedString = turnOver(inputString);
 
-    //文字のカウント処理
-    countLength = countCharacter(inputCharacter);
-    turnOverCharacter(countLength, inputCharacter);
-
+    printf("%s", reversedString);
     return 0;
 }
-
-int countCharacter(char *inputCharacter)
+//inputStringの配列の先頭アドレスを受け取る
+char turnOver(const char inputString[])
 {
-    int countLength = 0;
-    while(inputCharacter[countLength] != '\0'){
-        countLength++;
-    }
-        return (countLength);
+    char reversedString[40];
+    int i = 0,j = 0;
+    //何文字かを確認
 
-}
-
-void turnOverCharacter(int countLength, char *inputCharacter)
-{
-    while(countLength >= 0){
-        printf("%c", inputCharacter[countLength]);
-        countLength--;
+    while(inputString[i] != '\0'){
+        i++;
     }
+
+    //逆向きにして、別の配列に保存
+    while(i >= 0){
+        reversedString[j] = inputString[i];
+        printf("%c", reversedString[j]);
+        j++;
+        i--;
+    }
+
     printf("\n");
+    return *reversedString;
 }
