@@ -4,8 +4,7 @@
 char* turnOver(char *);
 int main()
 {
-    //reversedString[0]には'\0'が入っているので配列だけど1からスタート。
-    char inputString[40], reversedString[40];
+    char inputString[40];
     //文字入力
     printf("文字を入力してください。");
     scanf("%s", inputString);
