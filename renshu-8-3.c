@@ -1,5 +1,5 @@
+#include<stdio.h>
 #include<string.h>
-
 
 char* turnOver(char *);
 int main()
@@ -11,38 +11,29 @@ int main()
     scanf("%s", inputString);
 
     printf("%s", turnOver(inputString));
+    printf("\n");
     return 0;
 }
 //inputStringの配列の先頭アドレスを受け取る
 char* turnOver(char* inputString)
 {
-    char tmpString;
-    int i = 0,j = 0;
-    //何文字かを確認
+    char reversedString[40];
+    int i = 0,j = 0, n = 0;
 
+    //何文字かを確認
     while(inputString[i] != '\0'){
         i++;
     }
-    //最後にぬるが入ってるので、マイナス１
-
-    printf("%d", i);
+    //配列は0からはじまるのでマイナス１してあげる。
+    i = i - 1;
+    n = i;
     //逆向きにして、別の配列に保存
-    while(i > j){
-        tmpString = inputString[i];
-        inputString[i] = inputString[j];
-        inputString[j] = tmpString;
-        j++;
+    while(j <= n){
+        reversedString[j] = inputString[i];
         i--;
-//      printf("くるくるー\n");
+        j++;
     }
-    int k = 0;
-    while(k < j){
-    printf("%c", inputString[k]);
-    k++;
-    }
-    inputString[j] = '\0';
-    printf("%s", inputString);
-
-    printf("\n");
+    reversedString[j] = '\0';
+    strcpy(inputString, reversedString);
     return inputString;
 }
