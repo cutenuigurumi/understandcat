@@ -1,38 +1,34 @@
 #include<stdio.h>
 
-int lookup(const char *, char);
+int lookup(const char *, char *);
 int main()
 {
     int quantity;
-    char inputString[40], findCharacter;
+    char inputString[128], findCharacter;
     printf("文字列を入力してください。----");
     scanf("%s", inputString);
     printf("検索する文字を入力して下さい。----");
-    scanf("%c", &findCharacter);
+    scanf(" %c",&findCharacter);
+
 
     //関数に飛ばす
-    quantity = lookup(inputString, findCharacter);
-
-    printf("文字列は%d個です。", quantity);
+    printf("文字列は%d個です。\n", lookup(inputString, &findCharacter));
 
     return 0;
 
 }
 
-int lookup(const char inputString[], char findCharacter)
+int lookup(const char *inputString, char *findCharacter)
 {
-    int i = 0,quantityCharacter = 0;
+    int i = 0, countString = 0;
     //whileで'\0'になるまでくるくるまわす
-    printf("%s", inputString);
-    while(inputString[i] != '\n'){
-        if(inputString[i] == findCharacter){
-        //quantityCharacterにプラス１してあげる
-                quantityCharacter++;
-        printf("%c",inputString[i]);
+    while(inputString[i] != '\0'){
+        if(inputString[i] == *findCharacter){
+            countString++;
         }
-    i++;
+        i++;
     }
-    //returnでquantityCharacterを返してあげる
-    return quantityCharacter;
+    //returnで文字数を返してあげる
+    return countString;
 
 }
