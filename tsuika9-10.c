@@ -1,18 +1,27 @@
 #include<stdio.h>
+#include<string.h>
 
 int lookup(const char *, char *);
 int main()
 {
-    int quantity;
-    char inputString[128], findCharacter;
-    printf("文字列を入力してください。----");
-    scanf("%s", inputString);
+    int quantity,i = 0;
+    //41にするのはnull文字の分。
+    char inputString[11], inputFindCharacter[10], findOneCharacter;
+    printf("文字列を入力してください。\n10文字以上は読み込みません。----");
+    scanf("%11[^\n]%*[^\n]", inputString);
     printf("検索する文字を入力して下さい。----");
-    scanf(" %c",&findCharacter);
+    scanf("%s", inputFindCharacter);
+    //エラー処理
 
-
+    while(inputFindCharacter[i] != '\0'){
+        i++;
+    }
+    if(i != 1){
+        printf("1文字しか入力ができません。\nそれ以下は切り捨てられます\n");
+    }
+    findOneCharacter =  inputFindCharacter[0];
     //関数に飛ばす
-    printf("文字列は%d個です。\n", lookup(inputString, &findCharacter));
+    printf("文字列は%d個です。\n", lookup(inputString, &findOneCharacter));
 
     return 0;
 
