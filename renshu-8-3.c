@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<string.h>
 
-char* turnOver(char *);
+void turnOver(char *);
 int main()
 {
     char inputString[40];
@@ -9,12 +9,13 @@ int main()
     printf("文字を入力してください。");
     scanf("%s", inputString);
 
-    printf("%s", turnOver(inputString));
+    turnOver(inputString);
+    printf("%s", inputString);
     printf("\n");
     return 0;
 }
 //inputStringの配列の先頭アドレスを受け取る
-char* turnOver(char* inputString)
+void turnOver(char* inputString)
 {
     char reversedString[40];
     int i = 0,j = 0, n = 0;
@@ -34,5 +35,5 @@ char* turnOver(char* inputString)
     }
     reversedString[j] = '\0';
     strcpy(inputString, reversedString);
-    return inputString;
+    return;
 }
