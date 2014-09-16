@@ -21,7 +21,7 @@ int main()
 int lookup(const char *inputString, char *findCharacter)
 {
     int i = 0, countString = 0;
-    //whileで'\0'になるまでくるくるまわす
+    //whileで'\0'がくるまで
     while(inputString[i] != '\0'){
         if(inputString[i] == *findCharacter){
             countString++;
