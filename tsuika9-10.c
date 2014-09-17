@@ -8,9 +8,9 @@ int main()
     //41にするのはnull文字の分。
     char inputString[11], inputFindCharacter[10], findOneCharacter;
     printf("文字列を入力してください。\n10文字以上は読み込みません。----");
-    scanf("%11[^\n]%*[^\n]", inputString);
+    scanf("%10s%*[^\n]", inputString);
     printf("検索する文字を入力して下さい。----");
-    scanf("%s", inputFindCharacter);
+    scanf("%10s%*[^\n]", inputFindCharacter);
     //エラー処理
 
     while(inputFindCharacter[i] != '\0'){
