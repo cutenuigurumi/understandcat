@@ -20,7 +20,7 @@ int main()
         scanf("%s", student[i].name);
         printf("国語の成績----");
         scanf("%d", &student[i].japanese);
-        printf("英語の成績----");
+        printf("理科の成績----");
         scanf("%d", &student[i].science);
     }
 
