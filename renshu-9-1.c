@@ -17,23 +17,24 @@ int main()
     struct Record student[STUDENTNO];
 
     while(i < STUDENTNO) {
-        printf("生徒の名前----");
+        printf("%d番目の生徒の名前----", i + 1);
         if(scanf("%s", student[i].name) != 1){
             scanf("%*s");
+            printf("不正な値です。\n");
             continue;
         }
-        printf("国語の成績----");
+        printf("%d番目の国語の成績----", i + 1);
         if(scanf("%d", &student[i].japanese) != 1){
             scanf("%*s");
+            printf("エラーです。名前の入力に戻ります\n");
             continue;
         }
-        is_check(student[i].japanese);
-        printf("理科の成績----");
+        printf("%d番目の理科の成績----", i + 1);
         if(scanf("%d", &student[i].science) != 1){
             scanf("%*s");
+            printf("エラーです。名前の入力に戻ります\n");
             continue;
         }
-        is_check(student[i].science);
     i++;
     }
     printf("探したい人の名前を入れてください。");
@@ -58,13 +59,5 @@ void lookfor(struct Record *student, char *lookForThisName)
                 break;
             }
         }
-    }
-}
-
-void is_check(*score)
-{
-
-    if(score > 100 | score < 0){
-        printf("入力値がエラーみたいです。。\n");
     }
 }
