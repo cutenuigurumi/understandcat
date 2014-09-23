@@ -2,7 +2,7 @@
 
 #include<stdio.h>
 
-int is_check(double);
+int is_error(double);
 int main()
 {
     int i = 0, errorFlag = 0;
@@ -15,7 +15,7 @@ int main()
             printf("入力値がエラーみたいです。。\n");
             continue;
         }
-        errorFlag = is_check(weight[i]);
+        errorFlag = is_error(weight[i]);
         if(errorFlag  == 1){
             continue;
         }
@@ -40,7 +40,7 @@ int main()
 
 }
 
-int is_check(double weight)
+int is_error(double weight)
 {
     int errorFlag = 0;
     if(weight > 200 | weight < 0){
