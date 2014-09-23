@@ -35,7 +35,7 @@ int main()
             printf("エラーです。名前の入力に戻ります\n");
             continue;
         }
-    i++;
+        i++;
     }
     printf("探したい人の名前を入れてください。");
     scanf("%s", lookForThisName);
