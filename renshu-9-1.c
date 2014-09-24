@@ -1,10 +1,11 @@
+
 #define STUDENTNO 3
 #include<stdio.h>
 #include<string.h>
 
 struct Record {
 
-    char name[32];
+    char name[5];
     int japanese;
     int science;
 };
@@ -13,7 +14,7 @@ void lookfor(struct Record *, char *);
 int main()
 {
     int i = 0;
-    char lookForThisName[32];
+    char lookForThisName;
     struct Record student[STUDENTNO];
 
     while(i < STUDENTNO) {
@@ -37,10 +38,13 @@ int main()
         }
         i++;
     }
-    printf("探したい人の名前を入れてください。");
-    scanf("%s", lookForThisName);
+    printf("探したい人の名前を一文字入れてください。");
+    if(scanf("%s", &lookForThisName) != 1){
+        scanf("%*s");
+        printf("エラーです。最初の一文字だけ検索します。\n");
+    }
 
-    lookfor(student, lookForThisName);
+    lookfor(student, &lookForThisName);
 
 }
 
@@ -54,7 +58,7 @@ void lookfor(struct Record *student, char *lookForThisName)
         studentNameLength = strlen(student[i].name);
         //k studentNameLengthの文字数
         for(k = 0; k < studentNameLength; k++){
-            if(lookForThisName[k] == student[i].name[k]){
+            if(*lookForThisName == student[i].name[k]){
                 printf("氏名:%s, 国語:%d点, 英語:%d点\n", student[i].name, student[i].japanese, student[i].science);
                 break;
             }
