@@ -5,7 +5,7 @@
 
 struct Record {
 
-    char name[5];
+    char name[10];
     int japanese;
     int science;
 };
@@ -13,8 +13,8 @@ void lookfor(struct Record *, char *);
 
 int main()
 {
-    int i = 0;
-    char lookForThisName;
+    int i = 0, len = 0;
+    char lookForThisName[5];
     struct Record student[STUDENTNO];
 
     while(i < STUDENTNO) {
@@ -24,10 +24,19 @@ int main()
             printf("不正な値です。\n");
             continue;
         }
+        len = strlen(student[i].name);
+        if(len > 10){
+            printf("文字数が長過ぎます！10文字を越えた名前は入れられません\n");
+            continue;
+        }
         printf("%d番目の国語の成績----", i + 1);
         if(scanf("%d", &student[i].japanese) != 1){
             scanf("%*s");
             printf("エラーです。名前の入力に戻ります\n");
+            continue;
+        }
+        if(student[i].japanese > 100 | student[i].japanese < 0){
+            printf("100点を越える数値か0点より小さい数値が入力されました。\n名前の入力に戻ります。\n");
             continue;
         }
         printf("%d番目の理科の成績----", i + 1);
@@ -36,16 +45,22 @@ int main()
             printf("エラーです。名前の入力に戻ります\n");
             continue;
         }
+        if(student[i].science > 100 | student[i].science < 0){
+            printf("100点を越える数値か0点より小さい数値が入力されました。\n名前の入力に戻ります。\n");
+            continue;
+        }
+
+
         i++;
     }
     printf("探したい人の名前を一文字入れてください。");
-    if(scanf("%s", &lookForThisName) != 1){
+    if(scanf("%s", lookForThisName) != 1){
         scanf("%*s");
+    }
+    if(lookForThisName[2] != '\0'){
         printf("エラーです。最初の一文字だけ検索します。\n");
     }
-
-    lookfor(student, &lookForThisName);
-
+    lookfor(student, lookForThisName);
 }
 
 void lookfor(struct Record *student, char *lookForThisName)
@@ -58,7 +73,7 @@ void lookfor(struct Record *student, char *lookForThisName)
         studentNameLength = strlen(student[i].name);
         //k studentNameLengthの文字数
         for(k = 0; k < studentNameLength; k++){
-            if(*lookForThisName == student[i].name[k]){
+            if(lookForThisName[0] == student[i].name[k]){
                 printf("氏名:%s, 国語:%d点, 英語:%d点\n", student[i].name, student[i].japanese, student[i].science);
                 break;
             }
