@@ -1,4 +1,3 @@
-
 #define STUDENTNO 3
 #include<stdio.h>
 #include<string.h>
@@ -49,16 +48,14 @@ int main()
             printf("100点を越える数値か0点より小さい数値が入力されました。\n名前の入力に戻ります。\n");
             continue;
         }
-
-
         i++;
     }
     printf("探したい人の名前を一文字入れてください。");
     if(scanf("%s", lookForThisName) != 1){
         scanf("%*s");
     }
-    if(lookForThisName[2] != '\0'){
-        printf("エラーです。最初の一文字だけ検索します。\n");
+    if(lookForThisName[1] != '\0'){
+        printf("エラーです。最初の一文字(%c)だけ検索します。\n", lookForThisName[0]);
     }
     lookfor(student, lookForThisName);
 }
