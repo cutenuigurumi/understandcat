@@ -9,7 +9,7 @@ int main()
     char filename[256];
     int endWrite = 0;
 
-    fp = fopen("renshu-13-4.txt", "w");
+    fp = fopen("tsuika-13-4.txt", "w");
     if(fp == NULL){
         perror("ファイルのオープンに失敗しました。\n");
         return -1;
@@ -27,14 +27,13 @@ int write_profile(FILE *f)
     char name[16];
     int decision = 0;
     double weight = 0,height = 0;
-    char *format = "%s %-d %-4.1f\n";
-
+    char *format = "%s %-4.1f %-4.1f\n";
+   
     printf("名前:");
-    if(scanf("%15[^\n]%*[^\n]", name) != 1){
-        printf("%s", name);
-        printf("入力エラーです！\n");
-        scanf("%*s");
-    }
+    fgets(name, sizeof(name), stdin);
+    printf("%s", name);
+    name[strlen(name) -1] = '\0';
+
     printf("身長:");
     if(scanf("%lf", &height) != 1){
         scanf("%*s");
