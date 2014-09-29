@@ -6,10 +6,9 @@ int main()
 
     FILE *fp;
     char filename[10];
-    int errorFlag = 0, filenameLength = 0;
 
     printf("ファイル名を入力して下さい\n");
-    if(scanf("%s", filename) != 1){
+    if(scanf("%9[^\n]%*[^\n]", filename) != 1){
         scanf("%*s");
         printf("入力エラーです。\n");
     }
@@ -23,4 +22,3 @@ int main()
     }
     fclose(fp);
 }
-
