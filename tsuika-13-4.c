@@ -9,7 +9,7 @@ int main()
     char filename[256];
     int endWrite = 0;
 
-    fp = fopen("renshu-13-4.txt", "w");
+    fp = fopen("renshu-13-4.txt", "a");
     if(fp == NULL){
         perror("ファイルのオープンに失敗しました。\n");
         return -1;
@@ -43,6 +43,7 @@ int write_profile(FILE *f)
         scanf("%*s");
     }
     fflush( stdin );
+
     fprintf(f, format, name, height, weight);
     printf("書き込みました。\n");
 
@@ -68,4 +69,3 @@ int write_profile(FILE *f)
     return 0;
 
 }
-
