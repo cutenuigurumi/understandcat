@@ -1,20 +1,12 @@
 #include<stdio.h>
 #include<string.h>
 
-int write_addresslist(FILE *);
-void lookfor_addresslist(FILE *);
+int write_addresslist(char *);
+void lookfor_addresslist(char *);
 int main()
 {
-    FILE *fp;
     char filename[256];
     int endWrite = 0,decision = 0, errorFlag = 0;
-
-    fp = fopen("renshu-test-10-1.txt", "a+");
-
-    if(fp == NULL){
-        perror("ファイルのオープンに失敗しました。\n");
-        return -1;
-    }
 
     do{
         printf("登録…1 / 読み込み…0\n");
@@ -24,11 +16,11 @@ int main()
         if(decision == 1){
             //書き込みモード
             while(endWrite == 0){
-                endWrite = write_addresslist(fp);
+                endWrite = write_addresslist(filename);
             }
         } else if(decision == 0){
             //読み込みモード
-            lookfor_addresslist(fp);
+            lookfor_addresslist(filename);
         } else {
             printf("エラーです！");
             errorFlag = 1;
@@ -36,15 +28,22 @@ int main()
     }while(errorFlag == 1);
 
 
-    fclose(fp);
     return 0;
 }
 
-int write_addresslist(FILE *fp)
+int write_addresslist(char *filename)
 {
+
     char name[16], address[100], tel[20];
     int decision = 0;
     char format[] = "%s %-4.1f %-4.1f\n";
+    FILE *fp;
+    fp = fopen("renshu-test-10-1.txt", "a");
+    if(fp == NULL){
+        perror("ファイルのオープンに失敗しました。\n");
+        return -1;
+    }
+
 
     printf("氏名:");
     scanf("%s", name);
@@ -84,8 +83,14 @@ int write_addresslist(FILE *fp)
     return decision;
 }
 
-void lookfor_addresslist(FILE *fp)
+void lookfor_addresslist(char *filename)
 {
+    FILE *fp;
+    fp = fopen("renshu-test-10-1.txt", "r");
+
+    if(fp == NULL){
+        perror("ファイルのオープンに失敗しました。\n");
+    }
 
     char c;
     while(fscanf(fp, "%c", &c) != EOF){
