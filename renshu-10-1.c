@@ -1,11 +1,12 @@
 #include<stdio.h>
 #include<string.h>
+#define FILENAME "renshu-test-10-1.txt"
+#define RECORDLEN 63
 
-int write_addresslist(char *);
-void lookfor_addresslist(char *);
+int writeAddressList();
+void lookforAddressList();
 int main()
 {
-    char filename[256];
     int endWrite = 0,decision = 0, errorFlag = 0;
 
     do{
@@ -16,11 +17,11 @@ int main()
         if(decision == 1){
             //書き込みモード
             while(endWrite == 0){
-                endWrite = write_addresslist(filename);
+                endWrite = writeAddressList();
             }
         } else if(decision == 0){
             //読み込みモード
-            lookfor_addresslist(filename);
+            lookforAddressList();
         } else {
             printf("エラーです！");
             errorFlag = 1;
@@ -31,19 +32,17 @@ int main()
     return 0;
 }
 
-int write_addresslist(char *filename)
+int writeAddressList()
 {
 
-    char name[16], address[100], tel[20];
+    char name[20], address[20], tel[20];
     int decision = 0;
-    char format[] = "%s %-4.1f %-4.1f\n";
     FILE *fp;
     fp = fopen("renshu-test-10-1.txt", "a");
     if(fp == NULL){
         perror("ファイルのオープンに失敗しました。\n");
         return -1;
     }
-
 
     printf("氏名:");
     scanf("%s", name);
@@ -58,7 +57,7 @@ int write_addresslist(char *filename)
     }
     fflush( stdin );
 
-    fprintf(fp, "%s, %s, %s\n", name, address, tel);
+    fprintf(fp, "%s,%s,%s\n", name, address, tel);
     printf("書き込みました。\n");
 
     //decisionに1か0以外が入れられたらループ
@@ -83,17 +82,38 @@ int write_addresslist(char *filename)
     return decision;
 }
 
-void lookfor_addresslist(char *filename)
+void lookforAddressList()
 {
     FILE *fp;
     fp = fopen("renshu-test-10-1.txt", "r");
+    char buffer[100],lookforString[20], *name, *address, *tel, yesno[6];
+    int no = 0;
 
     if(fp == NULL){
         perror("ファイルのオープンに失敗しました。\n");
     }
-
-    char c;
-    while(fscanf(fp, "%c", &c) != EOF){
-        printf("%c", c);
+    printf("検索したい文字列を入れて下さい----");
+    if(scanf("%s", lookforString) != 1){
+        scanf("%*s");
     }
+
+    while(fgets(buffer, sizeof(buffer), fp) !=NULL){
+        name = strtok(buffer, ",");
+        address = strtok(NULL, ",");
+        tel = strtok(NULL, ",");
+        if(strstr(name, lookforString) != NULL) {
+        printf("名前:%-s\n住所:%-s\nTEL:%-s", name,address,tel);
+        }
+        printf("さらに検索を続けますか？(y/n)----");
+        if(scanf("%s", yesno) != 1){
+            scanf("%*s");
+        }
+        if(yesno[0] == 'y' || yesno[0] == 'Y'){
+            continue;
+        } else {
+            break;
+        }
+    }
+
+
 }
