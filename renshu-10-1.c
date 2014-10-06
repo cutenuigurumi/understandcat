@@ -81,19 +81,24 @@ int writeAddressList()
     }while(decision == 0);
     return decision;
 }
-
+/* ----------------------------------------------------------- *
+ * lookforAddressList : 検索したい名前を入力すると、一致した名前、住所、電話番号を返す
+ *   引数：なし
+ *   戻り値：なし
+ *   エラー時の処理：バッファをクリア
+ * ----------------------------------------------------------- */
 void lookforAddressList()
 {
     FILE *fp;
     fp = fopen("renshu-test-10-1.txt", "r");
-    char buffer[100],lookforString[20], *name, *address, *tel, yesno[6];
+    char buffer[100],lookforName[20], *name, *address, *tel, yesno[6];
     int no = 0;
 
     if(fp == NULL){
         perror("ファイルのオープンに失敗しました。\n");
     }
-    printf("検索したい文字列を入れて下さい----");
-    if(scanf("%s", lookforString) != 1){
+    printf("検索したい名前を入れて下さい----");
+    if(scanf("%s", lookforName) != 1){
         scanf("%*s");
     }
 
@@ -101,7 +106,7 @@ void lookforAddressList()
         name = strtok(buffer, ",");
         address = strtok(NULL, ",");
         tel = strtok(NULL, ",");
-        if(strstr(name, lookforString) != NULL) {
+        if(strstr(name, lookforName) != NULL) {
         printf("名前:%-s\n住所:%-s\nTEL:%-s", name,address,tel);
         }
         printf("さらに検索を続けますか？(y/n)----");
@@ -110,10 +115,12 @@ void lookforAddressList()
         }
         if(yesno[0] == 'y' || yesno[0] == 'Y'){
             continue;
+        } else if(yesno[0] =='n' || yesno[0] == 'N') {
+            printf("終了します\n");
+            break;
         } else {
+            printf("エラーです。終了します。\n");
             break;
         }
     }
-
-
 }
