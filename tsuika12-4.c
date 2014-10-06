@@ -5,6 +5,11 @@ struct xyz {
     long y;
     double z;
 };
+ * set_xyz: xとzを入れ替える
+ *   引数：数値型x long型y 小数点z
+ *   戻り値：なし
+ *   エラー時の処理：なし
+ * ----------------------------------------------------------- */
 
 void set_xyz(struct xyz *p, int x, long y, double z)
 {
