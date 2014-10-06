@@ -1,7 +1,6 @@
 #include<stdio.h>
 #include<string.h>
 #define FILENAME "renshu-test-10-1.txt"
-#define RECORDLEN 63
 
 int writeAddressList();
 void lookforAddressList();
@@ -82,7 +81,8 @@ int writeAddressList()
     return decision;
 }
 /* ----------------------------------------------------------- *
- * lookforAddressList : 検索したい名前を入力すると、一致した名前、住所、電話番号を返す
+ * lookforAddressList : 検索したい名前を入力すると、
+ * 一致した名前、住所、電話番号を画面に出力する
  *   引数：なし
  *   戻り値：なし
  *   エラー時の処理：バッファをクリア
@@ -123,4 +123,6 @@ void lookforAddressList()
             break;
         }
     }
+
+
 }
