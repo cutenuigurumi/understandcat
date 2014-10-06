@@ -60,6 +60,13 @@ int main()
     lookfor(student, lookForThisName);
 }
 
+/* ----------------------------------------------------------- *
+ * lookfor : lookForThisNameと一致するstudent[i].nameがあれば出力
+ *   引数：student:Recordの構造体　lookForThisName:探したい人の名前
+ *   戻り値：なし
+ *   エラー時の処理：なし
+ * ----------------------------------------------------------- */
+
 void lookfor(struct Record *student, char *lookForThisName)
 {
     int i, j, k, studentNameLength;
