@@ -1,8 +1,9 @@
 #define STUDENTNO 5
 
 #include<stdio.h>
+#include<stdbool.h>
 
-int is_error(double);
+int check_weight(double);
 int main()
 {
     int i = 0, errorFlag = 0;
@@ -15,7 +16,7 @@ int main()
             printf("入力値がエラーみたいです。。\n");
             continue;
         }
-        errorFlag = is_error(weight[i]);
+        errorFlag = check_weight(weight[i]);
         if(errorFlag  == 1){
             continue;
         }
@@ -40,13 +41,13 @@ int main()
 
 }
 /* ----------------------------------------------------------- *
- * is_error : 入力されたweightがおかしい数値でないか確認
- *   引数：weight ユーザが入力。体重。
+ * is_error : 入力された体重が200を越えていたり0以下だったら
+ * 戻り値でエラー、エラーメッセージを出力する。
+ *   引数：weight 体重
  *   戻り値：errorFlag エラーだったら1,そうでなければ0を返す
- *   エラー時の処理：なし
  * ----------------------------------------------------------- */
 
-int is_error(double weight)
+int check_weight(double weight)
 {
     int errorFlag = 0;
     if(weight > 200 | weight < 0){
