@@ -26,6 +26,12 @@ int main()
     return 0;
 
 }
+/* ----------------------------------------------------------- *
+ * lookup : inputStringの中にfindCharacterが何文字入っているのか調べる。
+ *   引数：*inputString ユーザが入力した文字列, findCharacterユーザが入力した文字
+ *   戻り値：coundString inputStringの中から何文字findCharacterが見つかったか。
+ *   エラー時の処理：なし
+ * ----------------------------------------------------------- */
 
 
 int lookup(const char *inputString, char *findCharacter)
