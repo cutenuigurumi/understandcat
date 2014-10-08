@@ -1,15 +1,17 @@
 #include<stdio.h>
+#define TIMES 50
+
 int main()
 {
     int i = 1;
-    while(i <= 50){
-        //5で割り切れるなら改行
+    char endChar[2];
+    while(i <= TIMES){
         if(i % 5 == 0){
-            printf("%2d\n", i);
-        //割り切れなければ後ろに数字が続くのでスペース
+            *endChar = '\n';
         } else {
-            printf("%2d ", i);
+            *endChar = ' ';
         }
+        printf("%2d%s ",i, endChar);
         i++;
     }
 }
