@@ -1,50 +1,50 @@
 #include<stdio.h>
 #include<string.h>
+#define LENGTH 11
 
-int lookup(const char *, char *);
+int lookup(const char *, char );
 int main()
 {
-    int quantity,i = 0;
-    //41にするのはnull文字の分。
-    char inputString[11], inputFindCharacter[11], findOneCharacter;
+    int i = 0;
+    //11にするのはnull文字の分。
+    char string[LENGTH], userInputChar[LENGTH], oneChar;
     printf("文字列を入力してください。\n10文字以上は読み込みません。----");
-    scanf("%10s%*[^\n]", inputString);
+    scanf("%10s%*[^\n]", string);
     printf("検索する文字を入力して下さい。----");
-    scanf("%10s%*[^\n]", inputFindCharacter);
+    scanf("%10s%*[^\n]", userInputChar);
     //エラー処理
 
-    while(inputFindCharacter[i] != '\0'){
+    while(userInputChar[i] != '\0'){
         i++;
     }
     if(i != 1){
         printf("1文字しか入力ができません。\nそれ以下は切り捨てられます\n");
     }
-    findOneCharacter =  inputFindCharacter[0];
+    oneChar =  userInputChar[0];
     //関数に飛ばす
-    printf("文字列は%d個です。\n", lookup(inputString, &findOneCharacter));
+    printf("文字列は%d個です。\n", lookup(string, oneChar));
 
     return 0;
 
 }
+
 /* ----------------------------------------------------------- *
- * lookup : inputStringの中にfindCharacterが何文字入っているのか調べる。
- *   引数：*inputString ユーザが入力した文字列, findCharacterユーザが入力した文字
- *   戻り値：coundString inputStringの中から何文字findCharacterが見つかったか。
- *   エラー時の処理：なし
+ * lookup : 文字列の中に検索する文字が何文字あるか探す。
+ *   引数：String: 文字列 oneChar: 文字
+ *   戻り値：文字列の中に、文字が何文字あるか。
  * ----------------------------------------------------------- */
 
-
-int lookup(const char *inputString, char *findCharacter)
+int lookup(const char *String, char oneChar)
 {
-    int i = 0, countString = 0;
+    int i = 0, stringCounter = 0;
     //whileで'\0'がくるまで
-    while(inputString[i] != '\0'){
-        if(inputString[i] == *findCharacter){
-            countString++;
+    while(String[i] != '\0'){
+        if(String[i] == oneChar){
+            stringCounter++;
         }
         i++;
     }
     //returnで文字数を返してあげる
-    return countString;
+    return stringCounter;
 
 }
