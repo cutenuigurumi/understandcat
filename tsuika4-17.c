@@ -2,22 +2,18 @@
 
 int main()
 {
-    int i = 0,countUpNumber = 1, inputNumber = 0;
+    int i = 1, number = 0;
 
     printf("整数を入力してください。----");
-    if(scanf("%d", &inputNumber) != 1){
+    if(scanf("%d", &number) != 1){
         scanf("%*s");
     }
-    //countUpNumberは1~9まで9になったら0をいれて1からスタート
+    //numberは1~9まで9になったら0をいれて1からスタート       
     //なのでiとは別の変数を使用
-    while(i < inputNumber){
-        printf("%d", countUpNumber);
-        if(countUpNumber == 9){
-            countUpNumber = 0;
-        }else{
-            countUpNumber++;
-        }
+    while(i <= number){
+        printf("%d", i % 10);
         i++;
     }
     printf("\n");
+
 }
