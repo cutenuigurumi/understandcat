@@ -11,7 +11,7 @@ int main()
         } else {
             *endChar = ' ';
         }
-        printf("%2d%s ",i, endChar);
+        printf("%2d%s",i, endChar);
         i++;
     }
 }
