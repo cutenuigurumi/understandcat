@@ -15,12 +15,9 @@ int main()
             errorFlag = 0;
         }
     }while(errorFlag == 1);
-
     printPyramid(inputStep);
-
     return 0;
 }
-
 
 /* ----------------------------------------------------------- *
  * printPyramid : ピラミッドを*で描写します。
