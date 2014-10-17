@@ -76,8 +76,6 @@ int checkExtension(const char *filename)
     bufferExtension = strtok(buffer, ".");
     bufferExtension = strtok(NULL, ".");
 
-    printf("DMSG %s\n", bufferExtension);
-
     //拡張子同士を比較同じなら0を返す
 
     if(strcmp(bufferExtension, extension1) == 0){
