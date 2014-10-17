@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     }
     strcpy(filename, argv[1]);
 
-    //.以降を見る処理に
+    //拡張子チェック
     if(checkExtension(filename) != 0){
         fprintf(stderr, "拡張子が違います\n");
         exit(-1);
