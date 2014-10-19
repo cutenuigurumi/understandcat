@@ -1,0 +1,33 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#define LENGTH 10
+
+int main(int argc, char *argv[])
+{
+    FILE *fp;
+    char c, filename[LENGTH];
+
+    //引数の数チェック
+    if(argc > 2){
+        fprintf(stderr, "引数が多すぎます。\n");
+        exit(-1);
+    }
+    if(argc == 1){
+        fprintf(stderr, "引数がありません\n");
+        exit(-1);
+    }
+    strcpy(filename, argv[1]);
+
+    fp = fopen(argv[1], "r");
+    if(fp == NULL){
+        fprintf(stderr, "ファイルのオープンに失敗しました。\nファイルがありません\n");
+        exit (-1);
+    }
+   
+    while((c = fgetc(fp)) != EOF){
+        putc(c,stdout);
+    }
+
+    exit(0);
+}
