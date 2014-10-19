@@ -6,7 +6,7 @@
 int main(int argc, char *argv[])
 {
     FILE *fp;
-    char c, string[10], filename[LENGTH];
+    char c, filename[LENGTH];
 
     //引数の数チェック
     if(argc > 2){
