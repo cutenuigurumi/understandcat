@@ -17,6 +17,10 @@ int main(int argc, char *argv[])
         fprintf(stderr, "引数がありません\n");
         exit(-1);
     }
+    if(strlen(argv[1] > LENGTH){
+        fprintf(stderr, "ファイル名が長過ぎます！\n終了します\n");
+        exit(-1);
+    }
     strcpy(filename, argv[1]);
 
     fp = fopen(argv[1], "r");
