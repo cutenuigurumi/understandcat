@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     FILE *fp;
     char c, filename[LENGTH];
 
-    //引数の数チェック
+    //引数チェック
     if(argc > 2){
         fprintf(stderr, "引数が多すぎます。\n");
         exit(-1);
