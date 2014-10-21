@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "引数がありません\n");
         exit(-1);
     }
-    if(strlen(argv[1]) > LENGTH){
+    if(strlen(argv[1]) >= LENGTH){
         fprintf(stderr, "ファイル名が長過ぎます\n");
         exit(-1);
     }
