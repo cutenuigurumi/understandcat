@@ -22,9 +22,14 @@ int main(int argc, char *argv[])
         fprintf(stderr, "引数がありません\n");
         exit(-1);
     }
+    if(strlen(argv[1]) > LENGTH){
+        fprintf(stderr, "ファイル名が長過ぎます\n");
+        exit(-1);
+    }
+
     strcpy(filename, argv[1]);
 
-    //拡張子チェック
+    //.以降を見る処理に
     if(checkExtension(filename) != 0){
         fprintf(stderr, "拡張子が違います\n");
         exit(-1);
@@ -68,16 +73,17 @@ int main(int argc, char *argv[])
  * ----------------------------------------------------------- */
 int checkExtension(const char *filename)
 {
-    char extension1[] = FEXTENSION1, extension2[] = FEXTENSION2, *bufferExtension,  buffer[LENGTH];
+    char extension1[] = FEXTENSION1, extension2[] = FEXTENSION2, bufferExtension[LENGTH];
+    int i = 0;
 
-    strcpy(buffer, filename);
-
-    //拡張子以下を切り取る
-    bufferExtension = strtok(buffer, ".");
-    bufferExtension = strtok(NULL, ".");
+    for(i = strlen(filename) - 1; i >= 0; i--){
+        if(filename[i] == '.'){
+            break;
+        }
+        strcpy(bufferExtension, &filename[i]);
+    }
 
     //拡張子同士を比較同じなら0を返す
-
     if(strcmp(bufferExtension, extension1) == 0){
         return 0;
     }
