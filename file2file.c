@@ -1,7 +1,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#define LENGTH 
+#define LENGTH 20
+#define FEXTENSION1 "txt"
 
 int main(int argc, char *argv[])
 {
@@ -13,15 +14,18 @@ int main(int argc, char *argv[])
         fprintf(stderr, "引数が多すぎます。\n");
         exit(-1);
     }
-    if(argc < 1){
-        fprintf(stderr, "引数が少なすぎます\n");
+    if(argc == 2){
+        fprintf(stderr, "引数が一つしかありません\n");
         exit(-1);
     }
-    if(strlen(argv[1]) >= LENGTH){
+    if(argc <= 1){
+        fprintf(stderr, "引数がありません。\n");
+        exit(-1);
+    }
+    if(strlen(argv[1]) >= LENGTH || strlen(argv[2]) >= LENGTH){
         fprintf(stderr, "ファイル名が長過ぎます！\n終了します\n");
         exit(-1);
     }
-    printf("%d", argc);
     strcpy(readFilename, argv[1]);
     strcpy(writeFilename, argv[2]);
 
@@ -44,6 +48,8 @@ int main(int argc, char *argv[])
         }
         fputc(c, fpWrite);
     }
+
+    fputs("書き込みが完了しました。\n", stdout);
 
     fclose(fpRead);
     fclose(fpWrite);
