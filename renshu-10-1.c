@@ -1,10 +1,11 @@
 #include<stdio.h>
 #include<string.h>
 #define FILENAME "renshu-test-10-1.txt"
+#define LENGTH 10
 
 int writeAddressList();
 void lookforAddressList();
-int isErrorString(char *);
+void clearBuffer();
 int main()
 {
     int endWrite = 0,decision = 0, errorFlag = 0;
@@ -12,16 +13,20 @@ int main()
     do{
         printf("登録…1 / 読み込み…0\n");
         if(scanf("%d", &decision) != 1){
-            scanf("%*s");
+            clearBuffer();
+            errorFlag = 1;
+            continue;
         }
         if(decision == 1){
             //書き込みモード
             while(endWrite == 0){
                 endWrite = writeAddressList();
             }
+            break;
         } else if(decision == 0){
             //読み込みモード
             lookforAddressList();
+            break;
         } else {
             printf("エラーです！");
             errorFlag = 1;
@@ -35,13 +40,13 @@ int main()
  * writeAddressList : 氏名、住所、電話番号をファイル名に
  * 書き込んでいく。
  *   引数：なし
- *   戻り値：decision 書き込みを続ける(1)か、終了する(0)かの判断。
+ *   戻り値：decisionFlag 書き込みを続ける(1)か、終了する(0)かの判断。
  * ----------------------------------------------------------- */
 int writeAddressList()
 {
 
-    char name[20], address[20], tel[20];
-    int decision = 0;
+    char name[LENGTH], address[LENGTH], tel[LENGTH];
+    int decisionFlag = 0;
     FILE *fp;
     fp = fopen(FILENAME, "a");
     if(fp == NULL){
@@ -50,41 +55,38 @@ int writeAddressList()
     }
 
     printf("氏名:");
-    decision = isErrorString(name);
-    if(decision == -1){
-        printf("エラーです。\n");
-    }
+    scanf("%9s%*[^\n]", name);
 
     printf("住所:");
-    decision = isErrorString(address);
+    scanf("%9s%*[^\n]", address);
 
     printf("電話番号:");
-    decision = isErrorString(tel);
+    scanf("%9s%*[^\n]", tel);
 
     fprintf(fp, "%s,%s,%s\n", name, address, tel);
     printf("書き込みました。\n");
 
-    //decisionに1か0以外が入れられたらループ
-    //1なら終了、0なら続ける
+    /*decisionFlagに1か0以外が入れられたらループ
+    *1なら終了、0なら続ける*/
     do{
         printf("終了しますか(Yes…1/ No…0):");
-        if(scanf("%d", &decision) != 1){
+        if(scanf("%d", &decisionFlag) != 1){
             printf("数値以外は入力できません");
-            scanf("%*s");
+            clearBuffer();
             continue;
         }
-        if(decision == 1){
+        if(decisionFlag == 1){
             printf("終了します\n");
-            return decision;
+            return decisionFlag;
         }
-        if(decision == 0){
+        if(decisionFlag == 0){
             break;
         }else{
             printf("1と0以外は入れられません。入力ミスです\n");
             continue;
         }
-    }while(decision == 0);
-    return decision;
+    }while(decisionFlag == 0);
+    return decisionFlag;
 }
 /* ----------------------------------------------------------- *
  * lookforAddressList : 検索したい名前を入力すると、
@@ -104,7 +106,7 @@ void lookforAddressList()
     }
     printf("検索したい名前を入れて下さい----");
     if(scanf("%s", searchName) != 1){
-        scanf("%*s");
+        clearBuffer();
     }
 
     while(fgets(buffer, sizeof(buffer), fp) !=NULL){
@@ -115,9 +117,8 @@ void lookforAddressList()
         printf("名前:%-s\n住所:%-s\nTEL:%-s", name,address,tel);
         }
         printf("さらに検索を続けますか？(y/n)----");
-        if(scanf("%s", yesno) != 1){
-            scanf("%*s");
-        }
+        scanf("%5s%*[^\n]", yesno);
+
         if(yesno[0] == 'y' || yesno[0] == 'Y'){
             continue;
         }
@@ -131,17 +132,13 @@ void lookforAddressList()
     }
 }
 /* ----------------------------------------------------------- *
- * isErrorString : 引数がエラーかどうかを判断して、エラーがあれば-1
- * を返して、バッファをクリア
- *   引数: char型の変数
- *   戻り値：何も無ければ0, エラーがあれば-1
+ * clearBuffer : バッファをクリア、エラーメッセージをプリント
+ *   引数: なし
+ *   戻り値:なし
  * ----------------------------------------------------------- */
 
-int isErrorString(char *string)
+void clearBuffer()
 {
-    if(scanf("%s", string) != 1){
-        scanf("%*s");
-        return -1;
-    }
-    return 0;
+    scanf("%*s");
+    printf("数値以外のものが入力されました。\n");
 }
