@@ -4,6 +4,7 @@
 #define LENGTH 20
 #define FEXTENSION1 "txt"
 
+int checkExtension(const char *, const char *);
 int main(int argc, char *argv[])
 {
     FILE *fpRead, *fpWrite;
@@ -26,8 +27,15 @@ int main(int argc, char *argv[])
         fprintf(stderr, "ファイル名が長過ぎます！\n終了します\n");
         exit(-1);
     }
+
     strcpy(readFilename, argv[1]);
     strcpy(writeFilename, argv[2]);
+
+    //.以降を見る処理に
+    if(checkExtension(readFilename, writeFilename) != 0){
+        fprintf(stderr, "拡張子が違います\n");
+        exit(-1);
+    }
 
     fpRead = fopen(readFilename, "r");
     if(fpRead == NULL){
@@ -55,4 +63,35 @@ int main(int argc, char *argv[])
     fclose(fpWrite);
     exit(0);
 
+}
+
+/* ----------------------------------------------------------- *
+ * checkExtension: 拡張子がtxtかhtmlかをチェックする。
+ *   引数：filename
+ *   戻り値：0拡張子がtxtかhtmlだった。1それ以外。
+ * ----------------------------------------------------------- */
+int checkExtension(const char *readFilename, const char *writeFilename)
+{
+    char extension1[] = FEXTENSION1, bufferExtension[LENGTH];
+    int i = 0;
+
+    for(i = strlen(readFilename) - 1; i >= 0; i--){
+        if(readFilename[i] == '.'){
+            break;
+        }
+        strcpy(bufferExtension, &readFilename[i]);
+    }
+    for(i = strlen(writeFilename) - 1; i >= 0; i--){
+        if(writeFilename[i] == '.'){
+            break;
+        }
+        strcpy(bufferExtension, &writeFilename[i]);
+    }
+
+    //拡張子同士を比較同じなら0を返す
+    if(strcmp(bufferExtension, extension1) == 0){
+        return 0;
+    } else {
+        return 1;
+    }
 }
