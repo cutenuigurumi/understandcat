@@ -65,33 +65,36 @@ int main(int argc, char *argv[])
 
 }
 
+
 /* ----------------------------------------------------------- *
- * checkExtension: 拡張子がtxtかhtmlかをチェックする。
+ * checkExtension: 拡張子がtxtかチェックする。
  *   引数：filename
- *   戻り値：0拡張子がtxtかhtmlだった。1それ以外。
+ *   戻り値：0拡張子がtxt。1それ以外。
  * ----------------------------------------------------------- */
 int checkExtension(const char *readFilename, const char *writeFilename)
 {
-    char extension1[] = FEXTENSION1, bufferExtension[LENGTH];
+    char extension1[] = FEXTENSION1, readBufferExtension[LENGTH], writeBufferExtension[LENGTH];
     int i = 0;
 
     for(i = strlen(readFilename) - 1; i >= 0; i--){
         if(readFilename[i] == '.'){
             break;
         }
-        strcpy(bufferExtension, &readFilename[i]);
+        strcpy(readBufferExtension, &readFilename[i]);
     }
     for(i = strlen(writeFilename) - 1; i >= 0; i--){
         if(writeFilename[i] == '.'){
             break;
         }
-        strcpy(bufferExtension, &writeFilename[i]);
+        strcpy(writeBufferExtension, &writeFilename[i]);
     }
 
     //拡張子同士を比較同じなら0を返す
-    if(strcmp(bufferExtension, extension1) == 0){
+    if(strcmp(readBufferExtension, extension1) == 0 && strcmp(writeBufferExtension, extension1) == 0){
         return 0;
     } else {
         return 1;
     }
 }
+
+
