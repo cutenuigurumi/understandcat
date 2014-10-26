@@ -8,8 +8,7 @@ int main()
     if(scanf("%d", &number) != 1){
         scanf("%*s");
     }
-    //numberは1~9まで9になったら0をいれて1からスタート       
-    //なのでiとは別の変数を使用
+
     while(i <= number){
         printf("%d", i % 10);
         i++;
