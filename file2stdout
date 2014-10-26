@@ -7,23 +7,24 @@ int main(int argc, char *argv[])
 {
     FILE *fp;
     char c, filename[LENGTH];
+    int length = LENGTH;
 
-    //引数チェック
+    //引数の数チェック
     if(argc > 2){
         fprintf(stderr, "引数が多すぎます。\n");
         exit(-1);
     }
     if(argc == 1){
-        fprintf(stderr, "引数がありません\n");
+        fprintf(stderr, "引数が少なすぎます。\n");
         exit(-1);
     }
     if(strlen(argv[1]) > LENGTH){
-        fprintf(stderr, "ファイル名が長過ぎます！\n終了します\n");
+        fprintf(stderr, "ファイル名が長過ぎます！\n%d文字以内にしてください。\n終了します\n", length);
         exit(-1);
     }
     strcpy(filename, argv[1]);
 
-    fp = fopen(argv[1], "r");
+    fp = fopen(filename, "r");
     if(fp == NULL){
         fprintf(stderr, "ファイルのオープンに失敗しました。\nファイルがありません\n");
         exit (-1);
@@ -33,7 +34,7 @@ int main(int argc, char *argv[])
         if(c == EOF){
             break;
         }
-        fputc(c, stdout);
+        printf("%c", c);
     }
 
     fclose(fp);
