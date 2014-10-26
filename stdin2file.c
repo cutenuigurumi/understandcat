@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
         if (strchr(string, '\n') != NULL) {
             string[LENGTH - 1] = '\0';
         } else {
-            fprintf(stderr, "文字数が多すぎます。\n");
+            fprintf(stderr, "文字数が多すぎます。\n%d文字以内にして下さい。\n", length);
             // 入力ストリームをクリアする処理。
             while(getchar() != '\n');
             continue;
