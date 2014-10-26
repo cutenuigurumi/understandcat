@@ -3,14 +3,14 @@
 #include<string.h>
 #define LENGTH 10
 #define MESSAGELENGTH 30
-#define FEXTENSION1 "txt"
-#define FEXTENSION2 "html"
+#define TXT "txt"
 
-int checkExtension(const char *);
+//拡張子を引数として渡す
+char* getExtension(const char *);
 int main(int argc, char *argv[])
 {
-    char extension[LENGTH], message[LENGTH], string[LENGTH], filename[LENGTH];
-    int extensionFlag = 0;
+    char message[LENGTH], string[LENGTH], filename[LENGTH], extension[LENGTH];
+    int extensionFlag = 0, length = LENGTH;
 
     FILE *fp;
     //引数の数チェック
@@ -19,22 +19,24 @@ int main(int argc, char *argv[])
         exit(-1);
     }
     if(argc == 1){
-        fprintf(stderr, "引数がありません\n");
+        fprintf(stderr, "引数が少なすぎます\n");
         exit(-1);
     }
     if(strlen(argv[1]) >= LENGTH){
-        fprintf(stderr, "ファイル名が長過ぎます\n");
+        fprintf(stderr, "ファイル名が長過ぎます\n%d文字しか入れられません", LENGTH);
         exit(-1);
     }
 
     strcpy(filename, argv[1]);
 
-    //.以降を見る処理に
-    if(checkExtension(filename) != 0){
+    //extensionに拡張子を収納
+    strcpy(extension, getExtension(filename));
+
+    //拡張子同士を比較同じなら0を返す
+    if(strcmp(extension, TXT) != 0){
         fprintf(stderr, "拡張子が違います\n");
         exit(-1);
     }
-
 
     fp = fopen(filename, "a");
     if(fp == NULL){
@@ -67,29 +69,23 @@ int main(int argc, char *argv[])
 }
 
 /* ----------------------------------------------------------- *
- * checkExtension: 拡張子がtxtかhtmlかをチェックする。
+ *   getExtension: filenameから拡張子だけを抜き出して、extension
+ *   に格納する。
  *   引数：filename
- *   戻り値：0拡張子がtxtかhtmlだった。1それ以外。
+ *   戻り値：なし。
  * ----------------------------------------------------------- */
-int checkExtension(const char *filename)
+char* getExtension(const char *filename)
 {
-    char extension1[] = FEXTENSION1, extension2[] = FEXTENSION2, bufferExtension[LENGTH];
+    char txt[4] = TXT;
+    static char extension[LENGTH];
     int i = 0;
 
     for(i = strlen(filename) - 1; i >= 0; i--){
         if(filename[i] == '.'){
             break;
         }
-        strcpy(bufferExtension, &filename[i]);
+        strcpy(extension, &filename[i]);
     }
+        return extension;
 
-    //拡張子同士を比較同じなら0を返す
-    if(strcmp(bufferExtension, extension1) == 0){
-        return 0;
-    }
-    if(strcmp(bufferExtension, extension2) == 0){
-        return 0;
-    } else {
-        return 1;
-    }
 }
