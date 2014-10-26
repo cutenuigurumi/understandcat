@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     //extensionに拡張子を収納
     strcpy(extension, getExtension(filename));
 
-    //拡張子同士を比較同じなら0を返す
+    //拡張子同士を比較
     if(strcmp(extension, TXT) != 0){
         fprintf(stderr, "拡張子が違います\n");
         exit(-1);
