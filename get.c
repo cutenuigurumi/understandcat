@@ -5,7 +5,7 @@
 #define METHOD1 "GET"
 #define METHOD2 "POST"
 #define SIZES 100
-#define SIZEFILE 20 
+#define SIZEFILE 20
 #define METHOD 5
 #define PATH 50
 #define COOKIE 20
@@ -35,19 +35,20 @@ int main()
                 fputs("このメソッドはGETです\n", stdout);
             }
             if(strcmp(method, METHOD2) == 0){
-                fputs("このメソッドはPOSTです\n", stdout); 
+                fputs("このメソッドはPOSTです\n", stdout);
             }
             //ここでiをプラスしないと次でスペースから始まってしまう。
-        } 
+        }
         if(count == 8){
-            bufferCookie = strtok(s, ":");  
+            bufferCookie = strtok(s, ":");
             bufferCookie = strtok(NULL, "\n");
             strcpy(cookie, bufferCookie);
-        }   
+        }
         count++;
-    }       
+    }
     fprintf(stdout, "パスは%s\n", path);
     fprintf(stdout, "クッキーの値は%s\n", cookie);
     fclose(fp);
     exit(0);
-}      
+}
+
