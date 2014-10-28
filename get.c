@@ -45,12 +45,14 @@ int main()
         }
         if(strcmp(s, "\n") == 0){
             paragrahFlag = 1;
+            fputs("メッセージボディ\n" , stdout);
             continue;
         }
         if(paragrahFlag == 1 && postFlag == 1){
             fputs(s ,stdout);
         }
-    }   
-    fclose(fp);
+    }
+    fclose(fp); 
     exit(0);
 }
+    
