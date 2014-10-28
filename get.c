@@ -11,10 +11,10 @@
 int main()
 {
     FILE *fp;
-    //配列を使用せず、ポインタを使用するのはstrtok関数が、区切った文字列へのポインタを返す変数のため。
+    //配列を使用せず、ポインタを使用するのはstrtok関数が区切った文字列へのポインタを返す変数のため。
     char s[SIZES], filename[SIZEFILE], *bufferMethod, method[METHOD], *bufferPath, path[PATH], *bufferCookie, cookie[COOKIE];
 
-    int i = 0, firstTime = 0,j = 0, ret = 0, postFlag = 0,paragrahFlag = 0;
+    int i = 0, firstTimeFlag = 0,j = 0, ret = 0, postFlag = 0,paragrahFlag = 0;
 
     fp = fopen(FILENAME, "r");
     if(fp == NULL){
@@ -24,7 +24,7 @@ int main()
     //ストリームから1行ずつ読み込み、NULLになったら終了
     while(fgets(s, sizeof(s), fp) != NULL){
         //リクエストラインの解析
-        if(firstTime == 0){
+        if(firstTimeFlag == 0){
             bufferMethod = strtok(s, " ");
             strcpy(method, bufferMethod);
             fprintf(stdout, "メソッドは%s\n", method);
@@ -34,7 +34,7 @@ int main()
             bufferPath = strtok(NULL, " ");
             strcpy(path, bufferPath);
             fprintf(stdout, "パスは%s\n", path);
-            firstTime = 1;
+            firstTimeFlag = 1;
         }
         ret = strncmp(s, "Cookie:", 7);
         if(ret == 0){
@@ -52,7 +52,6 @@ int main()
             fputs(s ,stdout);
         }
     }
-    fclose(fp); 
+    fclose(fp);
     exit(0);
 }
-    
