@@ -13,10 +13,10 @@
 int main()
 {
     FILE *fp;
-    //*methodを使用するのは、strtok関数が、区切った文字列へのポインタを返す変数のため。method[METHOD]は動かない。
-    char s[SIZES], filename[SIZEFILE], *bufferMethod, method[5], *bufferPath, path[PATH], *bufferCookie, cookie[COOKIE];
+    //配列を使用せず、ポインタを使用するのはstrtok関数が、区切った文字列へのポインタを返す変数のため。
+    char s[SIZES], filename[SIZEFILE], *bufferMethod, method[METHOD], *bufferPath, path[PATH], *bufferCookie, cookie[COOKIE];
 
-    int i = 0, count = 1,j = 0;
+    int i = 0, count = 1,j = 0, ret = 0;
 
     fp = fopen(FILENAME, "r");
     if(fp == NULL){
@@ -31,24 +31,18 @@ int main()
             strcpy(method, bufferMethod);
             bufferPath = strtok(NULL, " ");
             strcpy(path, bufferPath);
-            if(strcmp(method, METHOD1) == 0){
-                fputs("このメソッドはGETです\n", stdout);
-            }
-            if(strcmp(method, METHOD2) == 0){
-                fputs("このメソッドはPOSTです\n", stdout);
-            }
-            //ここでiをプラスしないと次でスペースから始まってしまう。
         }
-        if(count == 8){
+        ret = strncmp(s, "Cookie:", 7);
+        if(ret == 0){
             bufferCookie = strtok(s, ":");
             bufferCookie = strtok(NULL, "\n");
             strcpy(cookie, bufferCookie);
         }
         count++;
     }
+    fprintf(stdout, "メソッドは%s\n", method);
     fprintf(stdout, "パスは%s\n", path);
     fprintf(stdout, "クッキーの値は%s\n", cookie);
     fclose(fp);
     exit(0);
 }
-
