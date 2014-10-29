@@ -1,6 +1,3 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
 #define SIZES 200
 #define SIZEFILE 20
 #define METHOD 5
