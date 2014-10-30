@@ -28,7 +28,7 @@ int main (int argc, char *argv[]) {
     strcat(filename, datetime);
     strcat(filename, ".log");
 
-    fp = fopen(filename, "a");
+    fp = fopen(filename, "w");
 
     lissock = listen_socket (DEFAULT_PORT);
     for (;;) {
@@ -93,3 +93,4 @@ static int listen_socket (char *port) {
     fprintf (stderr, "failed to listen socket\n");
     exit (-1);
 }
+~           
