@@ -56,7 +56,7 @@ int main (int argc, char *argv[]) {
                 printf("if文の中\n");
                 break;
             }
-            fputs (buf, fp);
+            fputs (buf, stdout);
         }
         printf("出力直後\n");
         char buffer[200];
