@@ -9,26 +9,28 @@
 #define BUF_LINE_SIZE 1024
 #define FILENAME 50
 #define TIME 20
+#define PATH "/usr/local/bin/scd_education/bin/log/"
+#define FILE_HEAD "request_"
+#define EXTENSION ".log"
+#define INDEX "/usr/local/bin/scd_education/www/index.html"
+#define RESPONSE "response.txt"
 
 static int listen_socket (char *port);
 
 int main (int argc, char *argv[]) {
     int lissock;
     char filename[FILENAME], datetime[TIME];
-    FILE *fp;
+    FILE *response;
     time_t now;
     struct tm *str_date;
     now = time(NULL);
     str_date = localtime(&now);
     strftime(datetime,  TIME, "%Y%m%d%H%M%S", str_date);
-    printf("%s", str_date);
 
-
-    strcpy(filename,  "../log/request_");
+    strcpy(filename,  PATH);
+    strcat(filename, FILE_HEAD);
     strcat(filename, datetime);
-    strcat(filename, ".log");
-
-    fp = fopen(filename, "w");
+    strcat(filename, EXTENSION);
 
     lissock = listen_socket (DEFAULT_PORT);
     for (;;) {
@@ -36,20 +38,34 @@ int main (int argc, char *argv[]) {
         socklen_t addrlen = sizeof addr;
         int accsock;
         char buf[BUF_LINE_SIZE];
-        FILE *sockf;
+        FILE *fp, *sockf, *write_sockf;
 
+        //ソケットへの接続を待つ動作を用意する
         accsock = accept (lissock, (struct sockaddr*) &addr, &addrlen);
         if (accsock < 0) {
             fprintf (stderr, "accept failed\n");
             continue;
         }
-
+        printf("いちばんめ\n");
+        response = fopen(INDEX ,"r");
         sockf = fdopen (accsock, "r");
-        while (fgets (buf, sizeof buf, sockf)) {
+        write_sockf = fdopen(accsock, "w");
+        fp = fopen(filename, "w");
+        while (fgets (buf, sizeof(buf), sockf)) {
+            if(strcmp(buf, "\r\n") == 0){
+                printf("if文の中\n");
+                break;
+            }
             fputs (buf, fp);
         }
+        printf("出力直後\n");
+        char buffer[200];
+        while(fgets(buffer, sizeof(buffer), response)){
+            fputs(buffer, write_sockf);
+        }
+        printf("httpレスポンス送信後\n");
+        fclose(write_sockf);
         fclose (sockf);
-        fclose(fp);
         close (accsock);
     }
 }
