@@ -4,6 +4,7 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <time.h>
+#include <sys/stat.h>
 #define MAX_BACKLOG 5
 #define DEFAULT_PORT "50000"
 #define BUF_LINE_SIZE 1024
@@ -16,6 +17,7 @@
 #define FILE_HEAD "request_"
 #define EXTENSION ".log"
 #define DOCUMENTROOT "/usr/local/bin/scd_education/www"
+#define ERROR_ADR "/usr/local/bin/scd_education/www/404.html"
 #define RESPONSE "response.txt"
 
 static int listen_socket (char *port);
@@ -26,6 +28,7 @@ int main (int argc, char *argv[]) {
     FILE *response;
     time_t now;
     struct tm *str_date;
+    struct stat str_file;
     now = time(NULL);
     str_date = localtime(&now);
     strftime(datetime,  TIME, "%Y%m%d%H%M%S", str_date);
@@ -65,6 +68,7 @@ int main (int argc, char *argv[]) {
                 p_statuscode = strtok(NULL, " ");
                 strcpy(statuscode, p_statuscode);
                 status_line_flag = 1;
+                printf("最初にpathを取得%s\n", path);
             }
             if(strcmp(buf, "\r\n") == 0){
                 break;
@@ -76,11 +80,16 @@ int main (int argc, char *argv[]) {
         if(strcmp(path, "/") == 0){
             strcpy(path, "/index.html");
         }
-
         strcpy(return_path, DOCUMENTROOT);
         strcat(return_path, path);
+        printf("フルパス %s\n", return_path);
+        //該当するページが無かったときの処理
+        if(stat(return_path, &str_file) != 0){
+            strcpy(return_path, ERROR_ADR);
+            printf("if文の中%s\n", return_path);
+        }
         response = fopen(return_path ,"r");
-        fputs("HTTP/1.1 403 OK\n" , write_sockf);
+        fputs("HTTP/1.1 200 OK\n" , write_sockf);
         fputs("Content-Type: text/html; charset=shift_jis\n" , write_sockf);
         fputs("\n", write_sockf);
         while(fgets(buffer, sizeof(buffer), response)){
@@ -140,3 +149,4 @@ static int listen_socket (char *port) {
     fprintf (stderr, "failed to listen socket\n");
     exit (-1);
 }
+
