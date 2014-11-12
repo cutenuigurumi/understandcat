@@ -1,10 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <time.h>
-#include <sys/stat.h>
 #define MAX_BACKLOG 5
 #define DEFAULT_PORT "50000"
 #define BUF_LINE_SIZE 1024
@@ -13,12 +6,17 @@
 #define METHOD_LEN 5
 #define PATH_LEN 20
 #define EXPLAIN_LEN 20
+#define CONTENTTYPE_LEN 20
+#define CHARASET_LEN 20
 #define VERSION_LEN 10
+#define EXTENSION_LEN 5
 #define STATUSLINE_ARRAY 10
 #define CODE_200 0
 #define CODE_400 1
 #define CODE_403 2
 #define CODE_404 3
+#define EXTENSION_ARRAY 5
+#define CONTENT_HTML_TXT 0
 #define PATH_400 "/usr/local/bin/scd_education/www/400.html"
 #define PATH_403 "/usr/local/bin/scd_education/www/403.html"
 #define PATH_404 "/usr/local/bin/scd_education/www/404.html"
@@ -34,6 +32,12 @@ struct statusline {
     int status_code;
     char explain[EXPLAIN_LEN];
 };
+struct extension_list {
+    char extension[EXTENSION_LEN];
+    char content_type[CONTENTTYPE_LEN];
+    char charaset[CHARASET_LEN];
+};
+
 
 int main (int argc, char *argv[]) {
     int lissock;
@@ -49,6 +53,12 @@ int main (int argc, char *argv[]) {
         {"HTTP/1.0", 403, "Forbidden"},
         {"HTTP/1.0", 404, "Not Found"},
     };
+    //拡張子とcontent-typeを格納する構造体
+    struct extension_list str_extension_list[EXTENSION_ARRAY] = {
+        {".txt", "text/html;", "charset=UTF-8"},
+        {".html", "text/html;", "charset=UTF-8"},
+        {".jpg", "image/jpeg", ""}
+    };
     now = time(NULL);
     str_date = localtime(&now);
     strftime(datetime,  TIME, "%Y%m%d%H%M%S", str_date);
@@ -63,7 +73,7 @@ int main (int argc, char *argv[]) {
     for (;;) {
         struct sockaddr_storage addr;
         socklen_t addrlen = sizeof addr;
-        int accsock, status_line_flag = 0, tmp_status_code = 0,error_flag = 0;
+        int accsock, status_line_flag = 0, tmp_status_code = 0, tmp_contenttype = 0,error_flag = 0;
         char buf_request[BUF_LINE_SIZE],buf[BUF_LINE_SIZE];
         FILE *fp, *sockf, *write_sockf;
 
@@ -88,6 +98,7 @@ int main (int argc, char *argv[]) {
                 p_version = strtok(NULL, " ");
                 strcpy(version, p_version);
                 status_line_flag = 1;
+                printf("最初にpathを取得%s\n", path);
             }
             if(strcmp(buf, "\r\n") == 0){
                 break;
@@ -95,6 +106,7 @@ int main (int argc, char *argv[]) {
             fputs (buf, stdout);
         }
         char buffer[BUF_LINE_SIZE];
+
         //レスポンスを返す
         if(strcmp(path, "/") == 0){
             strcpy(path, "/index.html");
@@ -102,19 +114,38 @@ int main (int argc, char *argv[]) {
         strcpy(return_path, DOCUMENTROOT);
         strcat(return_path, path);
         response = fopen(return_path ,"r");
+        printf("フルパス %s\n", return_path);
         //400 badrequest ディレクトリトラバーサル対策
         if(strstr(return_path, "../") != NULL){
             strcpy(return_path, PATH_400);
             tmp_status_code = CODE_400;
             error_flag = 1;
         }
-
         //404 該当するページが無かったときの処理
         if(stat(return_path, &str_file) != 0){
             strcpy(return_path, PATH_404);
             tmp_status_code = CODE_404;
             error_flag = 1;
         }
+
+        //拡張子を取得
+        char *extension = strstr(path, ".");
+        int i;
+        for(i = 0; i < EXTENSION_ARRAY ; i++){
+            if((strcmp(extension, str_extension_list[i].extension)) == 0){
+                tmp_contenttype = i;
+                break;
+            }
+        }
+        printf("拡張子は%s, iは%d", str_extension_list[i].extension, tmp_contenttype);
+
+        //該当する拡張子が無い
+        if(i < EXTENSION_ARRAY){
+            strcpy(return_path, PATH_404);
+            tmp_status_code = CODE_404;
+            error_flag = 1;
+        }
+
         response = fopen(return_path ,"r");
         //403 閲覧禁止の場合の処理
         if(response == NULL && error_flag == 0){
@@ -128,7 +159,7 @@ int main (int argc, char *argv[]) {
             tmp_status_code = CODE_200;
         }
         fprintf(write_sockf, "%s %d %s\n", str_statusline[tmp_status_code].version, str_statusline[tmp_status_code].status_code, str_statusline[tmp_status_code].explain);
-        fputs("Content-Type: text/html; charset=shift_jis\n" , write_sockf);
+        fprintf(write_sockf, "Content-Type:%s %s\n" , str_extension_list[tmp_contenttype].content_type ,str_extension_list[tmp_contenttype].charaset);
         fputs("\n", write_sockf);
         while(fgets(buffer, sizeof(buffer), response)){
             fputs(buffer, write_sockf);
@@ -183,6 +214,7 @@ static int listen_socket (char *port) {
         freeaddrinfo (res);
         return sock;
     }
+
     fprintf (stderr, "failed to listen socket\n");
     exit (-1);
 }
