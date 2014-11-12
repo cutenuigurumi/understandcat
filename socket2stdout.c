@@ -1,6 +1,3 @@
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -186,8 +183,6 @@ static int listen_socket (char *port) {
         freeaddrinfo (res);
         return sock;
     }
-
     fprintf (stderr, "failed to listen socket\n");
     exit (-1);
 }
-
