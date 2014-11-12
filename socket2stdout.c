@@ -1,3 +1,10 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <time.h>
+#include <sys/stat.h>
 #define MAX_BACKLOG 5
 #define DEFAULT_PORT "50000"
 #define BUF_LINE_SIZE 1024
@@ -55,7 +62,7 @@ int main (int argc, char *argv[]) {
     };
     //拡張子とcontent-typeを格納する構造体
     struct extension_list str_extension_list[EXTENSION_ARRAY] = {
-        {".txt", "text/html;", "charset=UTF-8"},
+        {".txt", "text/plain;", "charset=UTF-8"},
         {".html", "text/html;", "charset=UTF-8"},
         {".jpg", "image/jpeg", ""}
     };
@@ -130,20 +137,14 @@ int main (int argc, char *argv[]) {
 
         //拡張子を取得
         char *extension = strstr(path, ".");
-        int i;
-        for(i = 0; i < EXTENSION_ARRAY ; i++){
-            if((strcmp(extension, str_extension_list[i].extension)) == 0){
-                tmp_contenttype = i;
-                break;
-            }
+        if((strcmp(extension, ".txt")) == 0){
+            tmp_contenttype = 0;
         }
-        printf("拡張子は%s, iは%d", str_extension_list[i].extension, tmp_contenttype);
-
-        //該当する拡張子が無い
-        if(i < EXTENSION_ARRAY){
-            strcpy(return_path, PATH_404);
-            tmp_status_code = CODE_404;
-            error_flag = 1;
+        if((strcmp(extension, ".html")) == 0){
+            tmp_contenttype = 1;
+        }
+        if((strcmp(extension, ".jpg")) == 0){
+            tmp_contenttype = 2;
         }
 
         response = fopen(return_path ,"r");
