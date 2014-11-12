@@ -1,3 +1,6 @@
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,29 +15,49 @@
 #define TIME 20
 #define METHOD_LEN 5
 #define PATH_LEN 20
-#define STATUSCODE_LEN 10
-#define PATH "/usr/local/bin/scd_education/bin/log/"
-#define FILE_HEAD "request_"
+#define EXPLAIN_LEN 20
+#define VERSION_LEN 10
+#define STATUSLINE_ARRAY 10
+#define CODE_200 0
+#define CODE_400 1
+#define CODE_403 2
+#define CODE_404 3
+#define PATH_400 "/usr/local/bin/scd_education/www/400.html"
+#define PATH_403 "/usr/local/bin/scd_education/www/403.html"
+#define PATH_404 "/usr/local/bin/scd_education/www/404.html"
+#define FILE_HEAD "/request_"
 #define EXTENSION ".log"
 #define DOCUMENTROOT "/usr/local/bin/scd_education/www"
-#define ERROR_ADR "/usr/local/bin/scd_education/www/404.html"
+#define LOGFILETROOT "/usr/local/bin/scd_education/log"
 #define RESPONSE "response.txt"
 
 static int listen_socket (char *port);
+struct statusline {
+    char version[VERSION_LEN];
+    int status_code;
+    char explain[EXPLAIN_LEN];
+};
 
 int main (int argc, char *argv[]) {
     int lissock;
-    char filename[PATH_LEN], return_path[PATH_LEN], datetime[TIME], method[METHOD_LEN], *p_method, path[PATH_LEN], *p_path, statuscode[STATUSCODE_LEN], *p_statuscode;
+    char filename[PATH_LEN], return_path[PATH_LEN], datetime[TIME], method[METHOD_LEN], *p_method, path[PATH_LEN], *p_path, version[VERSION_LEN], *p_version;
     FILE *response;
     time_t now;
     struct tm *str_date;
     struct stat str_file;
+    //ステータスラインの情報を格納する構造体
+    struct statusline str_statusline[STATUSLINE_ARRAY] = {
+        {"HTTP/1.0", 200, "OK"},
+        {"HTTP/1.0", 400, "Bad Request"},
+        {"HTTP/1.0", 403, "Forbidden"},
+        {"HTTP/1.0", 404, "Not Found"},
+    };
     now = time(NULL);
     str_date = localtime(&now);
     strftime(datetime,  TIME, "%Y%m%d%H%M%S", str_date);
 
     //logファイルの作成
-    strcpy(filename,  PATH);
+    strcpy(filename,  LOGFILETROOT);
     strcat(filename, FILE_HEAD);
     strcat(filename, datetime);
     strcat(filename, EXTENSION);
@@ -43,7 +66,7 @@ int main (int argc, char *argv[]) {
     for (;;) {
         struct sockaddr_storage addr;
         socklen_t addrlen = sizeof addr;
-        int accsock, status_line_flag = 0;
+        int accsock, status_line_flag = 0, tmp_status_code = 0,error_flag = 0;
         char buf_request[BUF_LINE_SIZE],buf[BUF_LINE_SIZE];
         FILE *fp, *sockf, *write_sockf;
 
@@ -58,38 +81,56 @@ int main (int argc, char *argv[]) {
         fp = fopen(filename, "a");
         while (fgets (buf, sizeof(buf), sockf)) {
             if(status_line_flag == 0){
-                //ここでコピーしておかないと、下でstrtokしているのでリクエストラインの出力がうまくいかない。
+                //一時変数に格納
                 strcpy(buf_request, buf);
                 //リクエストラインの解析
                 p_method = strtok(buf_request, " ");
                 strcpy(method, p_method);
                 p_path = strtok(NULL, " ");
                 strcpy(path, p_path);
-                p_statuscode = strtok(NULL, " ");
-                strcpy(statuscode, p_statuscode);
+                p_version = strtok(NULL, " ");
+                strcpy(version, p_version);
                 status_line_flag = 1;
-                printf("最初にpathを取得%s\n", path);
             }
             if(strcmp(buf, "\r\n") == 0){
                 break;
             }
             fputs (buf, stdout);
         }
-        char buffer[200];
+        char buffer[BUF_LINE_SIZE];
         //レスポンスを返す
         if(strcmp(path, "/") == 0){
             strcpy(path, "/index.html");
         }
         strcpy(return_path, DOCUMENTROOT);
         strcat(return_path, path);
-        printf("フルパス %s\n", return_path);
-        //該当するページが無かったときの処理
+        response = fopen(return_path ,"r");
+        //400 badrequest ディレクトリトラバーサル対策
+        if(strstr(return_path, "../") != NULL){
+            strcpy(return_path, PATH_400);
+            tmp_status_code = CODE_400;
+            error_flag = 1;
+        }
+
+        //404 該当するページが無かったときの処理
         if(stat(return_path, &str_file) != 0){
-            strcpy(return_path, ERROR_ADR);
-            printf("if文の中%s\n", return_path);
+            strcpy(return_path, PATH_404);
+            tmp_status_code = CODE_404;
+            error_flag = 1;
         }
         response = fopen(return_path ,"r");
-        fputs("HTTP/1.1 200 OK\n" , write_sockf);
+        //403 閲覧禁止の場合の処理
+        if(response == NULL && error_flag == 0){
+            tmp_status_code = CODE_403;
+            strcpy(return_path, PATH_403);
+            error_flag = 1;
+            //上でパスを変更しているので開き直す
+            response = fopen(return_path ,"r");
+        }
+        if(error_flag == 0){
+            tmp_status_code = CODE_200;
+        }
+        fprintf(write_sockf, "%s %d %s\n", str_statusline[tmp_status_code].version, str_statusline[tmp_status_code].status_code, str_statusline[tmp_status_code].explain);
         fputs("Content-Type: text/html; charset=shift_jis\n" , write_sockf);
         fputs("\n", write_sockf);
         while(fgets(buffer, sizeof(buffer), response)){
@@ -97,7 +138,7 @@ int main (int argc, char *argv[]) {
         }
         fclose(write_sockf);
         fclose (sockf);
-        close (accsock);
+        fclose (response);
     }
 }
 
