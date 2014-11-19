@@ -1,7 +1,3 @@
-hint: (e.g., 'git pull ...') before pushing again.
-hint: See the 'Note about fast-forwards' in 'git push --help' for details.
--bash-4.1$ less socket2stdout.c 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
