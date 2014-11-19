@@ -1,3 +1,7 @@
+hint: (e.g., 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+-bash-4.1$ less socket2stdout.c 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,17 +17,18 @@
 #define METHOD_LEN 5
 #define PATH_LEN 20
 #define EXPLAIN_LEN 20
-#define CONTENTTYPE_LEN 20
+#define CONTENTTYPE_LEN 30
 #define CHARASET_LEN 20
 #define VERSION_LEN 10
-#define EXTENSION_LEN 5
+#define CONTENT_LENGTH_LEN 10
+#define EXTENSION_LEN 10
 #define STATUSLINE_ARRAY 10
 #define CODE_200 0
 #define CODE_400 1
 #define CODE_403 2
 #define CODE_404 3
-#define EXTENSION_ARRAY 5
-#define CONTENT_HTML_TXT 0
+#define EXTENSION_ARRAY 10
+#define CONTENT_TYPE_HTML 0
 #define PATH_400 "/usr/local/bin/scd_education/www/400.html"
 #define PATH_403 "/usr/local/bin/scd_education/www/403.html"
 #define PATH_404 "/usr/local/bin/scd_education/www/404.html"
@@ -31,143 +36,208 @@
 #define EXTENSION ".log"
 #define DOCUMENTROOT "/usr/local/bin/scd_education/www"
 #define LOGFILETROOT "/usr/local/bin/scd_education/log"
-#define RESPONSE "response.txt"
 
 static int listen_socket (char *port);
 struct statusline {
-    char version[VERSION_LEN];
-    int status_code;
-    char explain[EXPLAIN_LEN];
+        char version[VERSION_LEN];
+        int status_code;
+        char explain[EXPLAIN_LEN];
 };
 struct extension_list {
     char extension[EXTENSION_LEN];
     char content_type[CONTENTTYPE_LEN];
-    char charaset[CHARASET_LEN];
+        char charaset[CHARASET_LEN];
 };
 
 
 int main (int argc, char *argv[]) {
     int lissock;
-    char filename[PATH_LEN], return_path[PATH_LEN], datetime[TIME], method[METHOD_LEN], *p_method, path[PATH_LEN], *p_path, version[VERSION_LEN], *p_version;
-    FILE *response;
+    char filename[PATH_LEN], return_path[PATH_LEN], datetime[TIME], method[METHOD_LEN], *p_method, path[PATH_LEN], *p_path, version[VERSION_LEN], *p_version, content_length[CONTENT_LENGTH_LEN], *p_content_length;
+    FILE *response, *response_binary;
     time_t now;
     struct tm *str_date;
-    struct stat str_file;
-    //ステータスラインの情報を格納する構造体
-    struct statusline str_statusline[STATUSLINE_ARRAY] = {
-        {"HTTP/1.0", 200, "OK"},
-        {"HTTP/1.0", 400, "Bad Request"},
-        {"HTTP/1.0", 403, "Forbidden"},
-        {"HTTP/1.0", 404, "Not Found"},
-    };
-    //拡張子とcontent-typeを格納する構造体
-    struct extension_list str_extension_list[EXTENSION_ARRAY] = {
-        {".txt", "text/plain;", "charset=UTF-8"},
+        struct stat str_file;
+        //ステータスラインの情報を格納する構造体
+        struct statusline str_statusline[STATUSLINE_ARRAY] = {
+                {"HTTP/1.0", 200, "OK"},
+                {"HTTP/1.0", 400, "Bad Request"},
+                {"HTTP/1.0", 403, "Forbidden"}, 
+                {"HTTP/1.0", 404, "Not Found"},
+        };
+        //拡張子とcontent-typeを格納する構造体
+        struct extension_list str_extension_list[EXTENSION_ARRAY] = {
         {".html", "text/html;", "charset=UTF-8"},
-        {".jpg", "image/jpeg", ""}
-    };
-    now = time(NULL);
-    str_date = localtime(&now);
-    strftime(datetime,  TIME, "%Y%m%d%H%M%S", str_date);
-
-    //logファイルの作成
-    strcpy(filename,  LOGFILETROOT);
-    strcat(filename, FILE_HEAD);
-    strcat(filename, datetime);
-    strcat(filename, EXTENSION);
+        {".htm", "text/html;", "charset=UTF-8"},
+                {".txt", "text/plain;", "charset=UTF-8"},
+                {".jpg", "image/jpeg", ""},
+                {".jpeg", "image/jpeg", ""},
+                {".ico", "image/x-icon", ""},
+                {".gif", "image/gif", ""},
+                {".png", "image/png", ""}
+        };
 
     lissock = listen_socket (DEFAULT_PORT);
     for (;;) {
         struct sockaddr_storage addr;
         socklen_t addrlen = sizeof addr;
-        int accsock, status_line_flag = 0, tmp_status_code = 0, tmp_contenttype = 0,error_flag = 0;
+        int accsock, status_line_flag = 0, tmp_status_code = 0, tmp_content_type = 0,error_flag = 0, int_content_length = 0;
         char buf_request[BUF_LINE_SIZE],buf[BUF_LINE_SIZE];
         FILE *fp, *sockf, *write_sockf;
 
-        //ソケットへの接続を待つ動作を用意する
+                //logファイルの作成
+                now = time(NULL);
+                str_date = localtime(&now);
+                strftime(datetime,  TIME, "%Y%m%d%H%M%S", str_date);
+        strcpy(filename,  LOGFILETROOT);
+                strcat(filename, FILE_HEAD);
+                strcat(filename, datetime);
+                strcat(filename, EXTENSION);
+
+                //ソケットへの接続を待つ動作を用意する
         accsock = accept (lissock, (struct sockaddr*) &addr, &addrlen);
         if (accsock < 0) {
-            fprintf (stderr, "accept failed\n");
-            continue;
+                        fprintf (stderr, "accept failed\n");
+                        continue;
         }
-        sockf = fdopen (accsock, "r");
-        write_sockf = fdopen(accsock, "w");
-        fp = fopen(filename, "a");
-        while (fgets (buf, sizeof(buf), sockf)) {
-            if(status_line_flag == 0){
-                //一時変数に格納
-                strcpy(buf_request, buf);
-                //リクエストラインの解析
-                p_method = strtok(buf_request, " ");
-                strcpy(method, p_method);
+                sockf = fdopen (accsock, "r");
+                write_sockf = fdopen(accsock, "w");
+                fp = fopen(filename, "w");
+                //デバッグ
+                int d = 0;
+                /*ここからリクエストを読み込み(while文の中が1リクエスト)
+                 *解析したり、logに吐き出したりする      */
+                while (fgets (buf, BUF_LINE_SIZE, sockf)) {
+                        if(status_line_flag == 0){
+                                //一時変数に格納
+                                strcpy(buf_request, buf);
+                                //リクエストラインの解析
+                                p_method = strtok(buf_request, " ");
+                                strcpy(method, p_method);
                 p_path = strtok(NULL, " ");
                 strcpy(path, p_path);
                 p_version = strtok(NULL, " ");
                 strcpy(version, p_version);
-                status_line_flag = 1;
-                printf("最初にpathを取得%s\n", path);
-            }
-            if(strcmp(buf, "\r\n") == 0){
-                break;
-            }
-            fputs (buf, stdout);
-        }
-        char buffer[BUF_LINE_SIZE];
-
-        //レスポンスを返す
-        if(strcmp(path, "/") == 0){
-            strcpy(path, "/index.html");
-        }
-        strcpy(return_path, DOCUMENTROOT);
-        strcat(return_path, path);
-        response = fopen(return_path ,"r");
-        printf("フルパス %s\n", return_path);
-        //400 badrequest ディレクトリトラバーサル対策
-        if(strstr(return_path, "../") != NULL){
-            strcpy(return_path, PATH_400);
+                                status_line_flag = 1;
+                                printf("pathを取得%s\n", path);
+                        }
+                        if(strstr(buf, "Content-Length:") != NULL){
+                                p_content_length = strtok(buf, ":");
+                                p_content_length = strtok(NULL, ":");
+                                strcpy(content_length, p_content_length);
+                        }
+                        if(strcmp(buf, "\r\n") == 0){
+                                printf("最後の行だったらループを抜ける\n");
+                                break;
+                        }
+                        fputs (buf, fp);
+                }
+                char buffer[BUF_LINE_SIZE];
+                
+                //レスポンスを返す
+                if(strcmp(path, "/") == 0){
+                        strcpy(path, "/index.html");
+                }
+                strcpy(return_path, DOCUMENTROOT);
+                strcat(return_path, path);
+                printf("フルパス %s\n", return_path);
+                //400 badrequest ディレクトリトラバーサル対策
+                if(strstr(return_path, "../") != NULL){
+                        strcpy(return_path, PATH_400);
             tmp_status_code = CODE_400;
             error_flag = 1;
+                }
+
+                //拡張子を取得
+                char *extension = strstr(path, ".");
+                //.が無かった時の処理を入れる
+                int i, debug;
+                for(i = 0; i < EXTENSION_ARRAY; i++){
+                        debug = strcmp(extension, str_extension_list[i].extension);
+                        if(debug == 0){
+                                tmp_content_type = i;
+                    printf("デバッグ！ %s,%d\n", str_extension_list[i].extension,debug);
+                                break;
+                        }
         }
+                //構造体の中に該当の拡張子が無かった時の処理を入れる。
+                if(i < EXTENSION_ARRAY){
+                        
+                }
+                //Content-Lengthがあったら、return_pathを何回読めば良いかを計算する
+//              int read_return_path_times = 0;
+//              if(content_length != NULL){
+//                      int_content_length = atoi(content_length);
+//                      printf("デバッグcontent_length %d", int_content_length);
+//                      read_return_path_times = int_content_length / BUF_LINE_SIZE;
+//                      printf("デバッグ read_return_path_times: %d", read_return_path_times);
+//              }
+
+        int file_size = 0;
+        struct stat file;
+                //ブラウザに返すファイルを開く
+                
         //404 該当するページが無かったときの処理
         if(stat(return_path, &str_file) != 0){
-            strcpy(return_path, PATH_404);
-            tmp_status_code = CODE_404;
-            error_flag = 1;
-        }
+                        printf("debug code:404の処理を通っていることを確認");
+                        strcpy(return_path, PATH_404);
+                        tmp_status_code = CODE_404;
+                        //tmp_content_type = CONTENT_TYPE_HTML;
+                        error_flag = 1;
+                }
+                if((strstr(str_extension_list[tmp_content_type].content_type, "image")) != NULL){
+                        response = fopen(return_path, "rb");
+                        printf("画像ファイル\n");
+                } else {
+                        response = fopen(return_path, "r");
+                        printf("テキストファイル\n");
+                }
 
-        //拡張子を取得
-        char *extension = strstr(path, ".");
-        if((strcmp(extension, ".txt")) == 0){
-            tmp_contenttype = 0;
-        }
-        if((strcmp(extension, ".html")) == 0){
-            tmp_contenttype = 1;
-        }
-        if((strcmp(extension, ".jpg")) == 0){
-            tmp_contenttype = 2;
-        }
+        //      response_binary = fopen(return_path ,"rb");
+        //      printf("binary readで開く\n");
+                
+                //Content-Lengthで使用する文字数カウントの処理
+//              fseek(response_binary, 0L, SEEK_END);
+//              file_size = ftell(response_binary);
+//              fclose(response_binary);
 
-        response = fopen(return_path ,"r");
-        //403 閲覧禁止の場合の処理
-        if(response == NULL && error_flag == 0){
-            tmp_status_code = CODE_403;
-            strcpy(return_path, PATH_403);
-            error_flag = 1;
-            //上でパスを変更しているので開き直す
-            response = fopen(return_path ,"r");
-        }
-        if(error_flag == 0){
-            tmp_status_code = CODE_200;
-        }
-        fprintf(write_sockf, "%s %d %s\n", str_statusline[tmp_status_code].version, str_statusline[tmp_status_code].status_code, str_statusline[tmp_status_code].explain);
-        fprintf(write_sockf, "Content-Type:%s %s\n" , str_extension_list[tmp_contenttype].content_type ,str_extension_list[tmp_contenttype].charaset);
-        fputs("\n", write_sockf);
-        while(fgets(buffer, sizeof(buffer), response)){
-            fputs(buffer, write_sockf);
-        }
-        fclose(write_sockf);
-        fclose (sockf);
-        fclose (response);
+                printf("403処理の前\n");
+                //403 閲覧禁止の場合の処理
+                if(response == NULL && error_flag == 0){
+            printf("debug code:403の処理を通っていることを確認");
+                        tmp_status_code = CODE_403;
+                strcpy(return_path, PATH_403);
+                        error_flag = 1;
+                        //上でパスを変更しているので開き直す
+                        response = fopen(return_path ,"r");
+                }
+                printf("403処理のあと\n");
+
+                if(error_flag == 0){
+                        tmp_status_code = CODE_200;
+                }
+                //fprintf(write_sockf, "%s %d %s\n", str_statusline[tmp_status_code].version, str_statusline[tmp_status_code].status_code, str_statusline[tmp_status_code].explain);
+                fprintf(write_sockf, "HTTP/1.1 200 OK\n");
+        fprintf(write_sockf, "Date: Tue, 18 Nov 2014 11:58:01 GMT\n");
+        fprintf(write_sockf, "Server: Apache\n");
+        fprintf(write_sockf, "Last-Modified: Mon, 26 Nov 2012 14:35:57 GMT\n");
+        fprintf(write_sockf, "ETag: \"1a4-4cf66d9f26e81\"\n");
+        fprintf(write_sockf, "Accept-Ranges: bytes\n");
+        fprintf(write_sockf, "Content-Length: 420\n");
+        fprintf(write_sockf, "\n");
+                printf("メッセージボディ送信前\n");
+                int size = 0, k = 0;
+                size = fread(buffer, sizeof( unsigned char ), 10000, response);
+                for( k=0; k<size; k++ ){
+                        if( k % 16 == 0 ) printf( "¥n" );
+                                fputc(buffer[k], write_sockf);
+                }
+//              while(fgets(buffer, sizeof(buffer), response)){
+//                      fputs(buffer, write_sockf);
+//              }
+                fclose(write_sockf);
+                fclose (sockf);
+                fclose (response);
+                fclose(fp);
     }
 }
 
@@ -175,14 +245,13 @@ static int listen_socket (char *port) {
     struct addrinfo hints, *res, *ai;
     int err;
 
-    //アドレス情報を設定する
+        //アドレス情報を設定する
     memset (&hints, 0, sizeof (struct addrinfo));
-    //ネットワークアドレスの種類(IPv4)を格納
+        //ネットワークアドレスの種類(IPv4)を格納
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE; /* Server Side */
-    /*getaddrinfoでstruct addrinfoにインターネットアドレスが格納される
-    *成功したらerrの中には0が格納される */
+        //getaddrinfoでstruct addrinfoにインターネットアドレスが格納される
     if ((err = getaddrinfo (NULL, port, &hints, &res)) != 0) {
         fprintf (stderr, "getaddrinfo error");
         exit (-1);
@@ -192,21 +261,21 @@ static int listen_socket (char *port) {
 
         //fprintf (stdout, "ai_next:%i\n", ai);
 
-        /*ソケットの作成
-         *引数はどうやって通信するかを指定している。
-         *sockにはソケットへのディスクリプタが格納される */
+                /*ソケットの作成
+                 *引数はどうやって通信するかを指定している。
+                 *sockにはソケットへのディスクリプタが格納される */ 
         sock = socket (ai->ai_family, ai->ai_socktype, ai->ai_protocol);
         if (sock < 0) {
             fprintf (stdout, "cannot create socket\n");
             continue;
         }
-        /*アドレスを割り当てる*/
+                /*アドレスを割り当てる*/
         if (bind (sock, ai->ai_addr, ai->ai_addrlen) < 0) {
             close (sock);
             fprintf (stdout, "cannot bind socket\n");
             continue;
         }
-        /*listen クライアント側からの接続要求を待つ*/
+                /*listen クライアント側からの接続要求を待つ*/
         if (listen (sock, MAX_BACKLOG) < 0) {
             close (sock);
             fprintf (stdout, "cannot listen socket\n");
