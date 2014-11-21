@@ -1,4 +1,4 @@
-ude <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <netdb.h>
@@ -225,8 +225,11 @@ int main (int argc, char *argv[]) {
         fprintf(write_sockf, "Last-Modified: Mon, 26 Nov 2012 14:35:57 GMT\n");
         fprintf(write_sockf, "ETag: \"1a4-4cf66d9f26e81\"\n");
         fprintf(write_sockf, "Accept-Ranges: bytes\n");
-//        fprintf(write_sockf, "Content-Length: %d\n", file_size);
-        fprintf(stdout, "Content-Length: %d\n", file_size);
+        if(binary_flag == 1){
+            fprintf(write_sockf, "Content-Length: %d\n", file_size);
+            fprintf(stdout, "Content-Length: %d\n", file_size);
+        }
+//        fprintf(write_sockf, "Content-Length: 420\n", file_size);
         fprintf(write_sockf, "Content-Type: %s\n", str_extension_list[tmp_content_type].content_type);
         fprintf(write_sockf, "\n");
         printf("メッセージボディ送信前\n");
@@ -235,8 +238,8 @@ int main (int argc, char *argv[]) {
             printf("binary_flagのif文の中\n");
             int size = 0, k = 0;
             size = fread(buffer, sizeof( unsigned char ), 10000, response);
-            printf("file_size %d", file_size);
-            for(k = 0; k < file_size; k++){
+            printf("file_size %d", size);
+            for(k = 0; k < size; k++){
                 fputc(buffer[k], write_sockf);
                 printf(".");
             }
