@@ -18,13 +18,14 @@
 #define VERSION_LEN 10
 #define CONTENT_LENGTH_LEN 10
 #define EXTENSION_LEN 10
+#define USER_INPUT_LEN 10
 #define STATUSLINE_ARRAY 10
 #define CODE_200 0
-#define CODE_400 1
-#define CODE_403 2
-#define CODE_404 3
+#define CODE_303 1
+#define CODE_400 2
+#define CODE_403 3
+#define CODE_404 4
 #define EXTENSION_ARRAY 10
-#define CONTENT_TYPE_HTML 0
 #define PATH_400 "/usr/local/bin/scd_education/www/400.html"
 #define PATH_403 "/usr/local/bin/scd_education/www/403.html"
 #define PATH_404 "/usr/local/bin/scd_education/www/404.html"
@@ -32,6 +33,14 @@
 #define EXTENSION ".log"
 #define DOCUMENTROOT "/usr/local/bin/scd_education/www"
 #define LOGFILETROOT "/usr/local/bin/scd_education/log"
+#define DELETE_COOKIE_DATE "Thu, 1-Jan-1970 00:00:00 GMT;"
+#define COOKIEVALUE1 "cookie_value1"
+#define COOKIEVALUE2 "cookie_value2"
+#define COOKIECREATE "/usr/local/bin/scd_education/www/cookie/login_check.html"
+#define COOKIEDELETE "/usr/local/bin/scd_education/www/cookie/logout.html"
+#define REDIRECT_LOCATION "http://54.64.221.93:50000/cookie/welcome.html"
+#define ID_TEST "admin"
+#define PASS_WORD_TEST "nmadmin001"
 
 static int listen_socket (char *port);
 struct statusline {
@@ -48,7 +57,7 @@ struct extension_list {
 
 int main (int argc, char *argv[]) {
     int lissock;
-    char filename[PATH_LEN], return_path[PATH_LEN], datetime[TIME], method[METHOD_LEN], *p_method, path[PATH_LEN], *p_path, version[VERSION_LEN], *p_version, content_length[CONTENT_LENGTH_LEN], *p_content_length;
+    char filename[PATH_LEN], return_path[PATH_LEN], datetime[TIME], method[METHOD_LEN], *p_method, path[PATH_LEN], *p_path, version[VERSION_LEN], *p_version, content_length[CONTENT_LENGTH_LEN], *p_content_length, username[USER_INPUT_LEN], password[USER_INPUT_LEN], *p_username, *p_password;
     FILE *response;
     time_t now;
     struct tm *str_date;
@@ -56,6 +65,7 @@ int main (int argc, char *argv[]) {
     //ステータスラインの情報を格納する構造体
     struct statusline str_statusline[STATUSLINE_ARRAY] = {
         {"HTTP/1.0", 200, "OK"},
+        {"HTTP/1.0", 303, "See Other"},
         {"HTTP/1.0", 400, "Bad Request"},
         {"HTTP/1.0", 403, "Forbidden"},
         {"HTTP/1.0", 404, "Not Found"},
@@ -76,7 +86,7 @@ int main (int argc, char *argv[]) {
     for (;;) {
         struct sockaddr_storage addr;
         socklen_t addrlen = sizeof addr;
-        int accsock, status_line_flag = 0, tmp_status_code = 0, tmp_content_type = 0,error_flag = 0, int_content_length = 0;
+        int accsock, status_line_flag = 0, tmp_status_code = 0, tmp_content_type = 0,error_flag = 0, int_content_length = 0, continue_flag = 0;
         char buf_request[BUF_LINE_SIZE],buf[BUF_LINE_SIZE];
         FILE *fp, *sockf, *write_sockf;
 
@@ -114,18 +124,27 @@ int main (int argc, char *argv[]) {
                 p_version = strtok(NULL, " ");
                 strcpy(version, p_version);
                 status_line_flag = 1;
-                printf("pathを取得%s\n", path);
             }
             if(strstr(buf, "Content-Length:") != NULL){
                 p_content_length = strtok(buf, ":");
                 p_content_length = strtok(NULL, ":");
                 strcpy(content_length, p_content_length);
             }
-            if(strcmp(buf, "\r\n") == 0){
-                printf("最後の行だったらループを抜ける\n");
-                break;
-            }
             fputs (buf, fp);
+            if(strcmp(buf, "\r\n") == 0){
+                if(strcmp(method, "POST") == 0){
+                    fgets(buf, atoi(content_length), sockf);
+                    fputs(buf, fp);
+                    p_username = strtok(buf, "&");
+                    strcpy(username, p_username);
+                    p_password = strtok(NULL, "&");
+                    strcpy(password, p_password);
+                    break;
+                }
+                if(strcmp(method, "GET") == 0){
+                    break;
+                }
+            }
         }
         char buffer[BUF_LINE_SIZE];
 
@@ -135,7 +154,6 @@ int main (int argc, char *argv[]) {
         }
         strcpy(return_path, DOCUMENTROOT);
         strcat(return_path, path);
-        printf("フルパス %s\n", return_path);
         //400 badrequest ディレクトリトラバーサル対策
         if(strstr(return_path, "../") != NULL){
             strcpy(return_path, PATH_400);
@@ -151,13 +169,12 @@ int main (int argc, char *argv[]) {
             debug = strcmp(extension, str_extension_list[i].extension);
             if(debug == 0){
                 tmp_content_type = i;
-                printf("デバッグ！ %s,%d\n", str_extension_list[i].extension,debug);
                 break;
             }
         }
         //構造体の中に該当の拡張子が無かった時の処理を入れる。
         if(i < EXTENSION_ARRAY){
-
+            error_flag = 1;
         }
         //Content-Lengthがあったら、return_pathを何回読めば良いかを計算する
 //      int read_return_path_times = 0;
@@ -174,7 +191,6 @@ int main (int argc, char *argv[]) {
 
         //404 該当するページが無かったときの処理
         if(stat(return_path, &str_file) != 0){
-            printf("debug code:404の処理を通っていることを確認");
             strcpy(return_path, PATH_404);
             tmp_status_code = CODE_404;
             //tmp_content_type = CONTENT_TYPE_HTML;
@@ -184,40 +200,41 @@ int main (int argc, char *argv[]) {
         if((strstr(str_extension_list[tmp_content_type].content_type, "image")) != NULL){
             response = fopen(return_path, "rb");
             if(response == NULL){
-                printf("ひらけませんでしたー\n");
+                printf("ひらけませんでした\n");
             } else {
             binary_flag = 1;
             //Content-Lengthで使用する文字数カウントの処理
             fseek(response, 0L, SEEK_END);
             file_size = ftell(response);
-            printf("binaryflag = %d\n", binary_flag);
-            printf("画像ファイルサイズ%d\n", file_size);
-            printf("ふぁいるぽいんたあ%d\n", response);
             fseek(response, 0L, SEEK_SET);
             }
         } else {
             response = fopen(return_path, "r");
-            printf("テキストファイル\n");
             text_flag = 1;
-            printf("textflag = %d\n", text_flag);
         }
-        printf("binary_flag%d, textflag %d\n", binary_flag,text_flag);
+//        printf("binary_flag%d, textflag %d\n", binary_flag,text_flag);
 
-        printf("403処理の前\n");
+//      printf("リダイレクト300");
+        if(strcmp(return_path, COOKIECREATE) == 0){
+            tmp_status_code = CODE_303;
+        }
+
+//      printf("403処理の前\n");
         //403 閲覧禁止の場合の処理
         if(response == NULL && error_flag == 0){
-            printf("debug code:403の処理を通っていることを確認");
             tmp_status_code = CODE_403;
             strcpy(return_path, PATH_403);
             error_flag = 1;
             //上でパスを変更しているので開き直す
             response = fopen(return_path ,"r");
         }
-        printf("403処理のあと\n");
+//      printf("403処理のあと\n");
+
 
         if(error_flag == 0){
             tmp_status_code = CODE_200;
         }
+
         fprintf(write_sockf, "%s %d %s\n", str_statusline[tmp_status_code].version, str_statusline[tmp_status_code].status_code, str_statusline[tmp_status_code].explain);
         fprintf(write_sockf, "Date: Tue, 18 Nov 2014 11:58:01 GMT\n");
         fprintf(write_sockf, "Server: Apache\n");
@@ -225,6 +242,24 @@ int main (int argc, char *argv[]) {
         fprintf(write_sockf, "Last-Modified: Mon, 26 Nov 2012 14:35:57 GMT\n");
         fprintf(write_sockf, "ETag: \"1a4-4cf66d9f26e81\"\n");
         fprintf(write_sockf, "Accept-Ranges: bytes\n");
+        if(tmp_status_code == CODE_303){
+            fprintf(write_sockf, "Location:%s \n", REDIRECT_LOCATION);
+        }
+        //cookieの処理(login_check.html)
+        int cookie_create_check;
+        cookie_create_check = strcmp(return_path, COOKIECREATE);
+        //printf("cookie_create_check= %d, return_path=\"%s\", COOKIECREATE=\"%s\"\n", cookie_create_check, return_path, COOKIECREATE);
+        if(cookie_create_check == 0){
+            fprintf(write_sockf, "Set-Cookie: CUSTOMER=%s; path=/cookie/;\n", COOKIEVALUE1);
+        }
+        //Cookieの設定(logout.html)
+        int cookie_delete_check;
+        cookie_delete_check = strcmp(return_path, COOKIEDELETE);
+        //printf("cookie_delete_check= %d, return_path=%s, COOKIEDELETE=%s\n", cookie_delete_check, return_path, COOKIEDELETE);
+        if(cookie_delete_check == 0){
+            fprintf(write_sockf, "Set-Cookie: CUSTOMER=%s; expires=%s;", COOKIEVALUE1, DELETE_COOKIE_DATE);
+        }
+
         if(binary_flag == 1){
             fprintf(write_sockf, "Content-Length: %d\n", file_size);
             fprintf(stdout, "Content-Length: %d\n", file_size);
@@ -235,17 +270,15 @@ int main (int argc, char *argv[]) {
         printf("メッセージボディ送信前\n");
         //バイナリデータの処理
         if(binary_flag == 1){
-            printf("binary_flagのif文の中\n");
+//          printf("binary_flagのif文の中\n");
             int size = 0, k = 0;
             size = fread(buffer, sizeof( unsigned char ), 10000, response);
-            printf("file_size %d", size);
             for(k = 0; k < size; k++){
                 fputc(buffer[k], write_sockf);
-                printf(".");
             }
-            printf("バイナリーフラッグの中\n");
+//          printf("バイナリーフラッグの中\n");
         }
-        printf("binary flagから外%d, txtflag %d", binary_flag,text_flag);
+//      printf("binary flagから外%d, txtflag %d", binary_flag,text_flag);
         if(text_flag == 1){
             while(fgets(buffer, sizeof(buffer), response)){
                 fputs(buffer, write_sockf);
